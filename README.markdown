@@ -4,7 +4,7 @@ Poznámky k přednášce boolovské funkce a jejich aplikace (MFF UK, 2010/11)
 Download
 --------
 
-[bf.pdf](/tom-kuca/bool-fce/bf.pdf)
+Stažení [bf.pdf](/tom-kuca/bool-fce/raw/master/all/bf.pdf)
 
 Opravy
 ------
@@ -17,7 +17,7 @@ Opravy můžete hlásit následujícími způsoby:
 
 Budu je obratem zařazovat. Pokud nemáte verzi staženou z github, doporučuju
 aktualizovat. Chyb se vyskytlo více než jsme čekali, zde je jich hodně
-opravených, zde je jich hodně opravených.
+opravených.
 
 Kompilace
 ---------
