@@ -1,0 +1,113 @@
+\input ../macros.tex
+
+\prednaska{9}{Minimalizace kvadratických funkcí}{}
+
+V této pøedná¹ce doká¾eme, jak z kvadratické DNF vyrobit ekvivalentní DNF
+minimální délky (a» u¾ do poètu termù nebo literálù).
+
+\lemma
+Nech» $\F_1$, $\F_2$ jsou dvì primární hornovské DNF reprezentující tuté¾
+funkci $f$ a nech» $\F_1'$, $\F_2'$ jsou èistì hornovské èásti $\F_1$ resp.
+$\F_2$. Pak $\F_1'$ i $\F_2'$ reprezentují tuté¾ funkci $f_H$, nazýváme ji
+èistì hornovská komponenta $f$.
+
+\proof 
+Uva¾me, jak u hornovských formulí vypadá konsenzus.
+
+
+$$
+\eqalign{
+ Cons(\<ÈH>, \<ÈH>) & = ÈH \hbox{ (ÈH je èistì hornovská formule)} \cr
+ Cons(\<ÈH>, \<POS>) & = POS \hbox{ (POS je pozitivní formule)} \cr
+ Cons(\<POS>, \<POS>) & \dots \hbox{nelze}
+}
+$$
+
+Nech» $\F$ je kanonická DNF funkce $f$. Její kanonickou èást lze vygenerovat
+z hornovských èástí $\F_1$, $\F_2$. $\F'_1$, $\F'_2$ mají stejnou mno¾inu
+primárních implikantù, tedy reprezentují stejnou funkci.
+
+Proè je potøeba, aby $\F_1$ i $\F_2$ byli primární? Pokud $\F_1'$ primání, pak $\F'_1 \subset \F$, toté¾ platí pro $\F'_2$, a tedy
+v¹e v $\F$ lze vygenerovat pomocí konsenzù jak z $\F'_1$, tak z $\F'_2$.
+Naopak, uvá¾íme li dvojici pozitivní formule, pozitivní formule + negativní
+literál absorbovaný pozitivními literály, zjistíme, ¾e pro ni závìr lemmatu
+neplatí.
+
+\lemma\id{positive_parts}
+Nech» $\F_1$, $\F_2$ jsou dvì primární ireduntantní hornovské DNF
+reprezentující tuté¾ funkci. Nech» $\F'_1$, $\F'_2$ jsou pozitivní èásti $\F_1$
+a $\F_2$. Pak $\F_1$ a $\F_2$ mají stejný poèet termù.
+
+\proof Nech» $G_F(V, E)$ je orientovaný graf pro DNF $\F$, kde 
+$$
+\eqalign{
+ V & = \{ T | \hbox{ $T$ je pozitivní primární implikant $\F$ } \} \cr
+ E & = \{ (T_1, T_2) | \hbox{ $T_1$ je implikantem $T_2 \cup \F_H$  } \},
+}
+$$ 
+kde $\F_H$ je funkce reprezentující èistì hornovskou èást $\F$. Tedy hrany
+grafu jsou tam, kde z $T_1, \F_H$ lze pomocí konsenzu odvodit $T_2$.
+
+Vlastnosti $G_\F$: 
+
+\itemize\ibull
+    \: tranzitinvì uzavøený -- pokud $(T_1, T_2), (T_2, T_3)$ jsou hrany, pak $T_3$ je implikant $T_2
+        \cup \F$ a $T_2$ je implikant $T_1 \cup \F_H$, tj. $T_3$ je implikant
+        $T_1 \cup \F_H \implication (T_1, T_3)$ je hrana.
+    \: pokud $\F$ iredundantní a $(T_1, T_2) \in E$, nemù¾e nastat, aby $T_1,
+    T_2 \in \F$, proto¾e pak by z $T_1 \cup \F_H$ ¹la odvodit $\F_2$.
+\endlist
+
+
+\claim
+Nech» $T$ je pozitivní primární implikant hornovské funkce f a nech» $\F$ je
+primární reprezentace $\F$. Pak existuje pozitivní term $T' \in \F$ takový, ¾e
+$T$  je implikant $T' \cup \F_H$, kde $\F_H$ je èistì hornovská èást $\F$.
+
+\proof 
+Rozmy¹lením, co jsou silnì souvislé komponenty grafu.
+
+
+\algo{Minimalizace kvadratické DNF délky $l$}
+\algin{kvadratická \<DNF> $\F$}
+\: z $\F$ vyrob primární iredundantní \<DNF> $\F_1$ (je také kvadratická)
+\: rozdìl $\F_1$ na $\F_1^L$ z lineárních termù a a $\F_1^Q$  z ryze
+kvadratických termù. $\F_1^L$ a $\F_1^Q$ jsou \<DNF> na disjunktních mno¾inách
+promìnných (pokud $x$ je v $\F_1^L$, nemù¾e být v $\F_1^Q$ $xy$ (spor
+s primárností) ani $\overline{x}y$ (lze provést konsenzus). Dále $\F_1^L$ je minimální.
+\: Pokud $\F_1^Q$ není falzifikovatelná, pak minimální \<DNF> ekvivalentní
+s $\F$ je $\F_1^L$ nebo 1, pokud je  $\F_1^L$ prázdná.
+\: $\F_1^Q$ je skrytì hornovská, lze ji tedy pøevést na její hornovskou verzi
+$\F_2$.
+\: rozdìlíme $\F_2$ na $\F_2^H$ (èistì hornovská èást) a $\F_2^P$ (pozitivní
+èást). Díky \ref{positive_parts} je $\F_2^P$ minimální, nebo» v¹echny primární
+implikanty jsou ryze kvadratické. Staèí tedy minimalizovat $\F_2^H$ (èistì
+hornovská ryze kvadratická formule bez primárních implikantù)
+\: definujme $G_{F_2^H}$ takto: 
+$$
+\eqalign{
+ V & \ldots \hbox{ promìmnné } \cr
+ E & = \{ (x, y) | \hbox{ $x, \overline{y}$ je term v $\F_2^H$  } \}.
+}
+$$
+Konsenzus v  $\F_2^H$ odpovídá tranzitivitì na $G_{F_2^H}$ $\implication$
+$\F_2^H$ a $\tilde{F}_2^H$ jsou logicky ekvivalentní právì tehdy, kdy¾
+$G_{F_2^H}$ $G_{\tilde{F}_2^H}$ mají stejný tranzitivní uzávìr (jen¾ odpovídá
+kanonické \<DNF>. Tím je problém pøeveden na hledání tranzitivní redukce
+orientovaného grafu.
+\algout{kvadratická  \<DNF> ekvivalentní s $\F$, její¾ délka je nejmen¹í mo¾ná}
+
+\algo{Tranzitivní redukce orientovaného grafu.}
+\algin{graf $G$}
+\: najdi v¹echny silnì souvislé kompomenty grafu
+\: ka¾dou nahrad jedním cyklem, co¾ je minimální graf co do poètu hran potøebný
+k zají¹tìní souvislosti. Obecnì je¹tì musím øe¹it hrany mezi silnì souvislými
+kompomentami, ale pro minimalizaci mi iredundantnost zaji¹»uje, ¾e takové hrany
+v grafu neexistují.
+\algin{graf minimální co poètu hran, který má stejný tranzitivní uzávìr jako
+$G$}
+
+\rem
+Najít minimální podgraf (resp. ``\<podDNF>'') je \<NP>-tì¾ké.
+
+\bye

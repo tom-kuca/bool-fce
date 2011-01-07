@@ -1,0 +1,1294 @@
+
+\prednaska{1}{Úvod do Boolovských funkcí}{}
+
+V~této kapitole nadefinujeme literály, logické operátory, Boolovské formule
+a funkce. Popí¹eme normální tvary formulí (\<DNF>, \<CNF>) a jejich vlastnosti. Dále
+zavedem implikanty, konsekventy, rezoluci (konsensus). V závìru popí¹eme
+rezoluèní metodu a doká¾eme její úplnost.
+item    
+
+\h{Boolovské funkce}
+
+\itemize\idot
+\: $x, y, z$ jsou \df{boolovské funkce}
+\: $v(x) \in \{0,1\}$ je \df{ohodnocovací funkce}
+\: $\neg{x}, \overline{x}$ je \df{negace $x$}
+\: promìnné a promìnné s negací jsou \df{literály}
+\:  $\lor, \land$ ($\implication, \iff$) jsou binární operátory
+\endlist
+
+\defnn{Boolovská formule}
+Boolovskou formuli definujme rekurzivnì:
+\itemize\idot   
+    \: ka¾dý literál je \df{Boolovská formule} (dále jen \df{formule})
+    \: pokud jsou $A, B$ formule, pak $\neg{A}, \neg{B}, A \lor B, A \land B, A \implication B, A \iff B$ jsou také formule
+\endlist
+
+\defnn{Normální formy}
+Disjunkci literálù nazýváme \df{klauzule}, konjunkci literálù nazýváme
+\df{term}. Formule je v \df{konjunktivní normální formì} (\<CNF>), pokud je
+konjunkcí klauzulí. Formule je v disjunktivní normální formì (\<DNF>), pokud je disjunkcí termù.
+
+\defnn{Ekvivalentní formule}
+Následující pravidla definují ekvivalentní formule, lze je vyu¾ít k úpravì formulí:
+\numlist\ndotted
+    \: $\neg{(A \lor B)} \equiv \neg{A} \land \neg{B}$ (de Morganovo pravidlo)
+    \: $\neg{(A \land B)} \equiv \neg{A} \lor \neg{B}$ (de Morganovo pravidlo)
+    \: $A \lor (B \land C) \equiv (A \lor B) \land (A \lor C)$ (distributivita $\lor$)
+    \: $A \land (B \lor C) \equiv (A \land B) \lor (A \land C)$ (distributivita $\land$)
+\endlist
+
+\defn \df{Boolovská funkce} je funkce $f: \{0, 1\}^n \rightarrow \{0, 1\}$. Lze ji reprezentovat napø. formulí nebo tabulkou.
+
+$$\vbox{
+\offinterlineskip
+\halign{
+\strut  \hfill\quad#\hfill & \hfill\quad#\hfill & \hfill\quad#\hfill & \vrule\hfill\quad#\hfill \cr
+$x_1$ & $x_2$ & $x_3$ & $f(x_1, x_2, x_3)$ \cr
+\noalign{\hrule}
+0 &0 &1 &0 \cr
+0 &1 &0 &1 \cr
+0 &1 &1 &0 \cr
+1 &0 &0 &1 \cr
+1 &0 &1 &1 \cr
+1 &1 &0 &0 \cr
+1 &1 &1 &1 \cr
+}}$$
+
+Vektory, pro které $f = 1$, nazýváme \df{true-pointy}, ostatní, pro které $f=0$ oznaèujeme jako \df{false-pointy}.
+
+
+Nebo na \<DNF> (disjunkce termù odpovídajících true-pointum):
+
+\obs
+Ke ka¾dé formuli existuje logicky ekvivalentní formule v \<CNF> i \<DNF>.
+
+\proof
+Pokud funkce reprezentujeme tabulkou, pak mù¾eme sestavit normální formy:
+\itemize\ibull
+    \: \<DNF>: disjunkce termù ``odpovídajících'' true-pointùm dané funkce
+        $$
+        f(x_1, x_2, x_3) = (\neg x_1 \wedge x_2 \wedge \neg x_3)\vee(x_1 \wedge \neg x_2 \wedge \neg x_3)\vee(x_1 \wedge \neg x_2 \wedge x_3)\vee(x_1 \wedge x_2 \wedge x_3)
+        $$
+    \: \<CNF>: konjunkce klauzulí ``odpovídajících'' false-pointùm dané funkce
+        $$
+        f(x_1, x_2, x_3) = (\neg x_1 \vee \neg x_2 \vee \neg x_3 )\wedge(\neg x_1 \vee \neg x_2 \vee x_3 )\wedge(\neg x_1 \vee x_2 \vee x_3 )\wedge(x_1 \vee x_2 \vee \neg x_3 )
+        $$
+\endlist
+
+\obs
+Poèet boolovských funkcí na $n$ promìnných je $2^{2^n}$ (tabulka má $2^n$ øádkù, na ka¾dém mù¾e být hodnota $f$ 1 nebo 0).
+
+\defnn{Uspoøádání boolovských funkcí}
+Definujme relaci $>$ takto: $f > g$ právì tehdy, kdy¾ $\forall x$:~$f(x)
+> g(x)$. Odbobnì $\ge, \le, <$.
+
+\medskip
+
+V následující èásti se zamìøíme na \<DNF>. Vìci, které doká¾eme, platí analogicky i pro \<CNF>.
+
+\medskip
+
+\defn
+Term $T$ je \df{implikantem} funkce $f$, pokud $T = 1 \implication f = 1$ (korektnì $\forall x T(x) = 1 \implication f(x) = 1$). Term $T$ je \df{primární implikant}, pokud po vypu¹tìní libovolného literálu pøestane být implikantem.
+
+\example
+$\underbrace{x_1\overline{x_2}}_{primární} \lor 
+ \underbrace{x_1x_3\overline{x_4}}_{neprimární} \lor 
+ \underbrace{x_2\overline{x_4}}_{primární} \lor 
+ \underbrace{x_2\overline{x_3}}_{primární}$
+
+Druhý term není primární implikant, nebo» $x_1\overline{x_4}$ je té¾ implikant.
+
+\claim 
+Pokud \<DNF> $\F$ reprezentuje funkci $f$ a $T$ je implikant $f$, pak $\F \lor T$ také reprezentuje $f$.
+
+\proof
+\itemize\ibull
+    \: $\F \le \F \lor T$   triviálnì 
+    \: $\F \ge \F \lor T$   z definice implikantu
+\endlist
+
+\defn Pokud $T_1, T_2$ jsou termy a $T_1 \le T_2$ (tj. $T_2$ je krat¹í, $T_2 \le T_1$ v mno¾inovém smyslu), øíkáme, ¾e $T_2$ \df{absorbuje} $T_1$.
+
+\obs Pokud $\F \lor T_1 \lor T_2$ reprezentuje $f$ a $T_1 \le T_2$, pak $\F \lor T_2$ reprezentuje tuté¾ funkci.
+
+\defn
+Termy $T_1$ a $T_2$ mají \df{konflikt} v promìnné $x$, pokud $x \in T_1$
+a $\neg{x} \in T_2$ (nebo $\neg{x} \in T_1$ a $x \in T_2$) a øekneme, ¾e $T_1$
+a $T_2$ mají \df{konsenus}, pokud mají konflikt v právì jedné promìnné.
+Oznaèíme-li termy $T_1 = A \land x$ resp. $T_2 = B \land \neg{x}$, pak
+$\<Cons>(A,B) = A \land B$.
+
+$$ \left.
+\eqalign{
+T_1  =  A  \land x \cr
+T_2  =  B  \land \bar{x} \cr}
+\right\} Cons(T_1,T_2) = A \lor B
+$$
+
+
+\claim
+Nech» $T_1, T_2$ jsou implikanty $f$ mající konsenzus. Pak $T_3 = \<Cons>(T_1, T_2)$ je také implikantem.
+
+\proof 
+\itemize\ibull
+    \: $T_1 \le f, T_2 \le f$
+    \: $T_1 = A \land x$
+    \: $T_2 = B \land \overline{x}$
+    \: $T_3 = A \land B$
+\endlist
+
+$T_3 = 1 \Rightarrow (A = 1) \land (B = 1) \Rightarrow (T_1 = 1) \lor (T_2 = 1) \Rightarrow f = 1$
+
+\defn \df{Kanonická \<DNF>} funkce $f$ je disjunkce v¹ech primárních implikantù funkce~$f$.
+\algo{Konsenzuální metoda}
+\algin{\<DNF> reprezentující $f$}
+\: Dokud se $\F$ mù¾e zmìnit: 
+\::proveï v¹echny absorbce, které je mo¾né provést
+\::najdi dva termy $T_1, T_2$, ¾e $\<Cons>(T_1, T_2)$ není absorbován ¾ádným termem v $\F$ a pøidej $\<Cons>(T_1, T_2)$ k $\F$
+\algout kanonická \<DNF> reprezentující $f$
+\endalgo
+\checkroom{2pt}
+\thmn{Úplnost konsenzuální metody}
+\numlist\nparen
+    \: Koneènost: ¾ádný term není pøidán dvakrát (díky transitivitì absorbce)
+    \: Koreknost: nech» $\F = R_1 \lor R_2 \lor \ldots \lor R_m$ je výstupem algoritmu a nech» $P$ je primární implikant $f$, který není obsa¾en v $\{R_1, \ldots, R_m\}$.
+        Oznaème ${\cal P} = \{T \vert T \ge P \& \forall l: T $ má konflikt s $R_l\}$. 
+
+        \FIXME ovìøit definici ${\cal P}$
+
+        Mno¾ina ${\cal P}$ je neprázdná, obsahuje alespoò samotné $P$.
+
+        Nech» $P^*$ je nejdel¹í (dle poètu literálù) term v ${\cal P}$.
+
+        \numlist\nromanp
+            \: $\|P^*\| = \|\F\|$,
+
+                pak $P^*$ má konflikt s ka¾dým $R_l$. 
+                Platí $P^* = 1 \implication \forall l: R_l = 0 \implication f = 0$, ale také
+                $P^* = 1 \implication P = 1 \implication f = 1$, co¾ je spor.
+                
+            \: $\|P^*\| < \|\F\|$, 
+                
+                pak $\exists x$ promìnná neobsa¾ená v $P^*$ 
+
+                $P^*x \notin {\cal P} \implication \exists i$, ¾e $P^*x \le R_i \implication R_i$ obsahuje $x$ a èást $P^*$
+                $P^*\overline{x} \notin {\cal P} \implication \exists j$, ¾e $P^*\overline{x} \le R_j \implication R_j$ obsahuje $\overline{x}$ a èást $P^*$, 
+                co¾ ale znamená, ¾e $\<Cons>(R_i, R_j)$ je obsazen v $P^* (\<Cons>(R_i, R_j) \ge P^*)$, tj. $\not\exists R_l$ absorbující $\<Cons>(R_i, R_j)$, co¾ je spor s fungováním algoritmu.
+
+                
+        \endlist
+
+
+\endlist
+
+\paran{Slo¾itost konsenzualní metody}
+
+Oba kroky, mìnící $\F$ v algoritmu konsenzualní metody lze provést v polynomiálním èase.
+Cyklus se ov¹em mù¾e mít exponenciální poèet iteraci. Ve speciálních pøípadech (napr. pokud je omezena délka klauzule, jako tøeba pro 2-SAT, lze dosáhnout lep¹ích výsledkù).
+
+\example
+$$
+\F = x_1 x_2 \ldots x_n \vee \bar{x_1} y_1 \vee \bar{x_2} y_2 \vee \ldots \vee \bar{x_n} y_n
+$$
+Kanonická formule k $\F$ je exponenciálnì dlouhá vzhledem k délce vstupní
+formule.
+
+\chapterend
+
+\prednaska{2}{Monotónní a regulární funkce}{}
+
+V~této kapitole zavedeme pojmy monotónní a regulární funkce a s tím související pojmy.
+
+\sec{Monotónní booleovské funkce}
+
+\defn
+
+Funkce $f$ je \df{pozitivní v promìnné $x_i$}, pokud $\forall x_1,\ldots,x_{i-1},x_{i+1},\ldots,x_n$ platí:
+
+$$
+f(x_1,\ldots,x_{i-1},1,x_{i+1},\ldots,x_n)\geq f(x_1,\ldots,x_{i-1},0,x_{i+1},\ldots,x_n)
+$$
+
+Obdobnì pokud je funkce $f$ \df{negativní v promìnné $x_i$} (pouze opaèná nerovnost):
+
+$$
+f(x_1,\ldots,x_{i-1},1,x_{i+1},\ldots,x_n)\leq f(x_1,\ldots,x_{i-1},0,x_{i+1},\ldots,x_n)
+$$
+
+\obs 
+Pokud DNF formule $\F$ neobsahuje ¾ádný negovaný literál $x_i$,
+reprezentuje booleovskou funkci, která je \df{pozitivní v $x_i$}. Tvrzení platí
+i obrácenì, pokud se omezíme pouze na \df{primární} DNF.
+
+\claim
+Nech» $f$ je pozitivní v $x_i$ a nech» $T$ je primární implikant $f$. Potom $T$ neobsahuje $\bar{x_i}$.
+
+\proof
+Sporem, nech» $A\overline{x}_i$ je primární implikant funkce $f$. Pøeèíslujeme
+promìnné tak, aby $A$ obsahovala právì jenom $x_1, \ldots, x_{i-1}$. $\forall
+x_{i+1}, \cdots, x_n$ platí $A \overline{x}_i$ je implikant (díky
+$1 = f(\underbrace{0, 1, \cdots}_{A}, \underbrace{0}_{x_i}, x_{i+1}, \ldots, x_n) \le 
+f(\underbrace{0, 1, \cdots}_{A}, 1, x_{i+1}, \ldots, x_n) \implication Ax_i$ je
+implikant $f \implication \<Cons>(Ax_i, A\overline{x}_i) = A$ je implikant $f$,
+tedy $A\overline{x}_i$ nemohl být primární implikant.
+
+\defn{}
+Funkce $f$ je \df{pozitivní/negativní}, pokud je pozitivní/negativní ve
+v¹ech promìnných. V¹echny funkce, které jsou pozitivní, nebo negativní se
+nazývají \df{monotónní}. Funkce, která je v ka¾dé promìnné pozitivní nebo
+negativní se nazývají \df{unátní}.
+
+\obs Z pozitivní \<DNF> lze v polynomiálním èase vyrobit kanonickou \<DNF>
+(staèí absorbce).
+
+\sec{Regulární funkce}
+
+\defn
+Nech» $f$ je booleovská funkce na $n$ promìnných. Øekneme, ¾e \df{$x_i$ je
+silnìj¹í ne¾ $x_j$ vzhledem k $f$} \foot{BUNO $i<j$}, pokud $\forall
+x_1,\ldots,x_{i-1},x_{i+1},\ldots,x_{j-1},x_{j+1},\ldots,x_n$:
+
+$$
+f(x_1,\ldots,x_{i-1},{\bf 1},\ldots,x_{j-1},{\bf 0},\ldots,x_n)\geq f(x_1,\ldots,x_{i-1},{\bf 0},\ldots,x_{j-1},{\bf 1},\ldots,x_n)
+$$
+
+
+\nota
+Znaèíme následovnì: $x_i \succeq_{f} x_j$. Zavedeme té¾ symboly $\succ_{f}$ a $\sim{f}$:
+$$
+\eqalign{
+x_i \succ_{f} x_j & \iff x_i \succeq_{f} x_j \land \neg ( x_j \succeq_{f} x_i ) \cr
+x_i \sim_{f} x_j  & \iff x_i \succeq_{f} x_j \land x_j \succeq_{f} x_i
+}
+$$
+
+\thm
+Relace $\succeq_{f}$ je pøeduspoøádání na mno¾inì promìnných.
+
+\proof
+Doká¾eme, ¾e relace je reflexivní a tranzitivní.
+\itemize\ibull
+	\: reflexivita: Dodefinujeme relaci $\succeq_{f}$ pro $i=j$.
+	\: tranzitivita: Doká¾eme, ¾e pro libovolné $i,j,k$ (BUNO $i<j<k$) platí:
+$$
+x_i \succeq_{f} x_j \land x_j \succeq_{f} x_k \iff x_i \succeq_{f} x_k
+$$
+
+Z definice relace $\succeq_{f}$ odvodíme:
+	\numlist\nparen
+		\:$f(..\underbrace{1}_{i}..\underbrace{0}_{j}..\underbrace{0}_{k}..)
+\underbrace{\geq}_{x_i \succeq_{f} x_j} f(..\underbrace{0}_{i}..\underbrace{1}_{j}..\underbrace{0}_{k}..)
+\underbrace{\geq}_{x_j \succeq_{f} x_k} f(..\underbrace{0}_{i}..\underbrace{0}_{j}..\underbrace{1}_{k}..)$
+		\:$f(..\underbrace{1}_{i}..\underbrace{1}_{j}..\underbrace{0}_{k}..)
+\underbrace{\geq}_{x_j \succeq_{f} x_k} f(..\underbrace{1}_{i}..\underbrace{0}_{j}..\underbrace{1}_{k}..)
+\underbrace{\geq}_{x_i \succeq_{f} x_j} f(..\underbrace{0}_{i}..\underbrace{1}_{j}..\underbrace{1}_{k}..)$
+	\endlist
+Tedy dohromady
+$\forall x_1,\ldots,x_{i-1},x_{i+1},\ldots,x_{k-1},x_{k+1},\ldots,x_n$:
+$$
+f(..\underbrace{1}_{i}..\underbrace{0}_{k}..)\geq f(..\underbrace{0}_{i}..\underbrace{1}_{k}..)
+$$
+\endlist
+Q.E.D.
+
+\defn
+
+Pozitivní booleovská funkce $f$ je \df{regulární}, pokud uspoøádání podle $\succeq_{f}$
+je úplné uspoøádání.
+
+\chapterend
+
+\prednaska{3}{Algoritmus pro testování regularity funkcí}{}
+
+Cílem této kaiptoly je popsat algoritmus na rozpoznávání regulárních funkcí.
+V prùbìhu celé kapitoly uva¾ujeme, ¾e na vstupu je pozitivní DNF formule.
+
+\thm\id{bc_thm}
+Nech» $f$ je pozitivní boolovská funkce v $n$ promìnných a $\F$ je kanonická DNF funkce $f$. Zapi¹me $\F$ ve tvaru 
+$$\F = A x_i x_j \lor Bx_i \lor Cx_j \lor D,$$
+kde $x_i, x_j$ jsou lib. promìnné a $A, B, C, D$ jsou DNF na zbylých promìnných. Pak $x_i \succeq x_j$ právì tehdy, kdy¾ $B \ge C$.
+
+\proof
+BÚNO $i=1$, $j=2$. Z definice $\succeq$ dostaneme $x_i \succeq x_j \iff f(1, 0, \ldots) \ge f(0, 1, \ldots) \iff B \lor D \ge C \lor D$.
+Staèí tedy dokázat $B \lor D \ge C \lor D \iff B \ge C$.
+
+    $\invimplication$: platí triviálnì
+
+    $\implication$: staèí ukázat, ¾e ka¾dý implikant $p \in C$ je absorbován nìjakým implikantem z $B$.
+
+$$ p \hbox{ implikant } C \left\{
+\eqalign{
+&\hbox{$px_j$ je implikant $f$, který je primání\hfill} \cr
+&\hbox{$p$ je absorbován implikantem $q$ v $B \lor D$. } \cr
+}
+\right. 
+$$
+$q$ nemù¾e být v $D$, proto¾e pak by $q$ absorbovalo $px_2$, a tedy by $\F$ nebyla kanonická.
+
+
+Jak ovìøit, ¾e $B \ge T$? 
+
+Dosadíme do $B$ jediné ohodnocení promìnných z $T$, pro které $T = 1$ a po
+dosazení ovìøíme falzifikovatelnost DNF $B'$, která vznikne. Pokud $B'$
+falzifikuje, tak $B \not\ge T$, pokud $B = 1$, tak $B \ge T$. 
+
+Nebo také ménì formálnì: ovìøuju-li, ¾e $B \ge C$ a $B$, $C$ jsou pozitivní formule, staèí ovìøit, ¾e
+v¹echny implikanty v $C$ jsou absorbované nìjakým implikantem v $B$. V obecném
+pøípadì je to tì¾ké, pro pozitivní formule staèí nalézt podtermy.
+
+Jak ovìøit, ¾e $B \sim T$? 
+Pro ka¾dé $i$, $j$ otestujeme, zda $x_i \succeq x_j$ a $x_j \succeq x_i$ v èase $\Theta(nm^2)$, kde $n$ je poèet promìnných formule a $m$ poèet termù.
+
+\h{Algoritmus na rozpoznávání regularity}
+
+\numlist\nparen
+\: $\Theta(n^3m^2)$: otestuj v¹echny dvojice promìnných
+\: $\Theta(n^2m^2\log{n})$: pomocí tøídícího algoritmu
+\: $\Theta(n^2m^2)$: 
+
+    Definujeme $W$ matici $n \times n$, kde $W[k, j] = \#$ termù obsahujících
+    $x_k$ délky $j$. Její øádky oznaème $R_i$.
+
+
+\numlist\nalpha
+    \:  $x_i \sim x_j \implication R_i = R_j$ 
+    \:  $x_i \succeq x_j \implication R_i > R_j$  (dle lexikografického uspoøádání)
+\endlist
+
+\proof
+
+\numlist\nalpha
+    \:  $x_i \sim x_j \iff B = C$ (ve smyslu vìty \ref{bc_thm}) $\implication$ nech» $p$ je implikant $C$, díky $\ge \exists q \in B$ absorbující $p$ a obrácenì, tj. $ p = q \implication B$ a $C$ jsou identické DNF
+    \: Chceme $ x_i \succ x_j \implication R_i  > R_j $. Platí $x_i \succ x_j \iff B > C$. Definujme
+    $$
+    \eqalign{
+    &\hbox{$B(d) = \{p \vert \vert p\vert = d \& Tx_i$ je term v $B\}$} \cr
+    &\hbox{$C(d) = \{p \vert \vert p\vert = d \& Tx_j$ je term v $C\}$} 
+    }
+    $$
+
+    Nech» $\delta = \<min>\{d \vert B(d) \not=  C(d)\}$. Takové $\delta$ existuje, nebo» $B > C$. Nech» $p \in C(d)$. Z $B > C$ plyne, ¾e $\exists$ term $T \lor B$ absorbující $\prod_{k \in P} x_k$
+
+    \numlist\nparen
+    \: $\vert Q \vert < \vert P \vert$ nemù¾e nastat, proto¾e pak $T \in C$ (a¾ do $\delta$ jsou $B(d)$ i $C(d)$ toto¾né, a tedy $C$ není kanonická.
+    \:$\vert Q \vert = \vert P \vert$, pak $Q = P$ a $\prod_{k \in P} x_k \in B$
+        $ \implication C(\delta) \subseteq B(\delta)$, zároveò $C(\delta) 
+        \not= B(\delta)$ (z definice $\delta$), tedy $ R_i > R_j$
+    \endlist
+\endlist
+
+Algoritmus nejprve sestrojí matici, poté lexikograficky setøídí její øádky a nakonec pro ka¾dé dva sousední øádky ovìøí, ¾e pro pøíslu¹ná $i$, $j$ platí $x_i \succeq x_j$.
+
+
+Slo¾itost: Inicializace matice probìhne v èase $\O(n^2)$. Hodnoty v matici
+lze spoèítat v $O(nm)$ jedním prùchodem formule $\F$. Setøídìní øádkù matice lze provést pøihrádkovým tøídìním v lineárním èase. 
+
+\endlist
+
+\rem Vhodnou datovou strukturou lze porovnání $x_i \succeq x_j$ provést v $\O(nm)$ a celý algoritmus má pak slo¾itost $\O(n^2m)$.
+
+\chapterend
+
+\prednaska{4}{Duální funkce}{}
+
+V této kapitole zavedeme pojem duálních funkcí a popí¹eme jejich vlastnosti.
+V závìru popí¹eme algoritmus, který pøevede regulární funkci na její duál.
+
+\medskip
+
+\defnn{Duální funkce}
+Nech» $f(x_1, \dots, x_n)$ je booleovská funkce. Pak \df{duální boolovská
+funkce} $f^d$ je definována pøedpisem $f^d(x) = \neg f(\neg x)$.
+
+\example
+
+$$
+\eqalign{
+f(x_1, \dots, x_5) &= x_1x_2 \lor x_3x_4 \lor x_1x_4x_5 \lor x_2x_3x_5 \cr
+f^d(x_1, \dots, x_5) &= \neg f(\neg x_1, \dots, \neg x_5) = \cr
+& = \neg (\overline{x_1}\overline{x_2} \lor \overline{x_3}\overline{x_4} \lor \overline{x_1}\overline{x_4}\overline{x_5} \lor \overline{x_2}\overline{x_3}\overline{x_5} \cr
+& = (x_1 \lor x_2) \land (x_3 \lor x_4) \land (x_1 \lor x_4 \lor x_5) \land (x_2
+\lor x_3 \lor x_5) \cr
+& = (x_1 \lor x_2x_4 \lor x_2x_5) \land (x_3 \lor x_2x_4 \lor x_4x_5) \cr
+& = (x_1x_3 \lor x_2x_4 \lor x_1x_4x_5 \lor x_2x_3x_5)
+}
+$$
+
+Duální funkce má svou interpretaci v teorii grafù: 
+
+    \halign{\qquad#\dotfill&~#\hfil\cr
+    \hbox to 0.15\hsize{}\cr
+    $f$       &v¹echny cesty $st$ \cr
+    $f^d$     &v¹echny øezy \cr
+    }
+
+
+\fig{../4-dualni-funkce/dual.eps}{\epsfxsize}
+
+Slo¾itost dualizace je neznámá. Je známý kvazi-polynomiální algoritmus ve
+velikosti výstupu. DNF zápis duální funkce obecnì mù¾e být exponenciálnì dlouhý
+k délce DNF zápisu $f$:
+
+$$
+\eqalign{
+f(x_1, \dots, x_n) &= x_1x_2 \lor x_3x_4 \lor \dots \lor x_{2n-1}x_{2n} \cr
+f^d(x_1, \dots, x_n) &= (x_1 \lor x_2)(x_3 \lor x_4)\dots(x_{2n-1} \lor x_{2n}) \cr
+& =\hbox{$2^n$ termù délky $n$} 
+}
+$$
+
+\defn
+$\vec{x}$ je \df{minimální true-point} funkce $f$ (\<MTP>) 
+$\iff  f(\vec{x}) = 1 \& \forall  i : f(\vec{x} - e_i) = 0 $
+$\iff$  $\vec{x}$ odpovídá primární implikantu $f$
+
+$\vec{x}$ je \df{maximální false-point} funkce $f$ (\<MFP>) 
+$\iff  f(\vec{x}) = 0 \& \forall  i : f(\vec{x} \cup e_i) = 1 $
+$\iff$  $\vec{x}$ odpovídá primární implikantu $f^d$
+
+
+\obs 
+Nech» $\prod_{i \in I}{x_i}$ je primární implikant v $f^d$. Pak $I$ je minimální mno¾ina indexù taková, ¾e 
+
+$$ \left.
+\eqalign{
+x_i  =  1, i \in I    \cr
+x_i  =  0, i \notin I  \cr}
+\right\} \implication f^d(x) = 1
+$$
+
+$f^d(x) = 1 \iff \neg f(\neg x) = 0 \iff f(\neg x) = 0$
+
+$I$ je minimální mno¾ina indexù taková, ¾e 
+
+$$ \left.
+\eqalign{
+x_i  =  0, i \in I    \cr
+x_i  =  1, i \notin I  \cr}
+\right\} \implication f(x) = 0
+$$
+
+$\implication$ nuly v $\vec{x}$ odpovídají promìnným v primárním implikantu
+$f^d$.
+
+V následující èásti uká¾eme, ¾e pro dualizaci pozitivní DNF nám staèí algoritmus, který na vstupu dostane seznam
+MTP a na výstupu vydá seznam \<MFP>. 
+
+\thm
+
+Nech» $f(x_1, \dots, x_n)$ je regulární  funkce, 
+kde $x_1 \succeq_f x_2 \succeq_f \dots \succeq_f x_n$ a nech» $x \in \{0, 1\}^{n-1}$. 
+Pak $(\vec{x}, 0)$ je \<MFP> $\iff (\vec{x}, 1)$ je \<MTP>
+
+\proof 
+
+Nech» $(\vec{x}, 0)$ je \<MFP> funkce $f$ $\implication (\vec{x}, 1)$ je \<TP>.
+Zároveò $f(x_1, \dots, x_{i-1}, 0, x_{i+1}, \dots, 1) \le f(\vec{x}, 0) = 0$,
+tedy $(\vec{x}, 1)$ je \<MTP> funkce $f$.
+
+Obdobnì nech» $(\vec{x}, 1)$ je \<MTP> funkce $f$ $\implication (\vec{x}, 0)$ je \<FP>.
+Zároveò $f(x_1, \dots, x_{i-1}, 1, x_{i+1}, \dots, 0) \le f(\vec{x}, 1) = 1$,
+tedy $(\vec{x}, 0)$ je \<MFP> funkce $f$.
+
+\defn
+Nech» $f(x_1, \dots, x_n)$ je booleovská funkce. Definujme funkci $f_i$ jako
+\df{restrikci} funkce $f$ po zafixování $x_i = x_{i+1} = \dots x_n = 1$.
+Dodefinujme $f_{n+1} = f$.
+
+\thm 
+
+Nech» $f$ je pozitivní boolovská funkce a nech» $x \in \{0, 1\}^{n-1}$. Potom
+$(\vec{x}, 1)$ je \<MFP> právì tehdy, kdy¾ $\vec{x}$ je \<MFP> $f_{n-1}$ (tj. $f$
+na prvních $n-1$ promìnných).
+
+\proof Zøejmý, z definice \<MFP>.
+
+\algo{Dualizace regulárních funkcí}
+\algin{formule $f$}
+\: Pro $i \in (n+1, \dots, 2)$:
+\:: vygeneruj \<MFP> funkce $f_i$, pro které $x_{i-1} = 0$
+\:: zafixuj $x_{i-1} = 1$ a zjisti \<MTP> funkce $f_{i-1}$
+\algout{formule $f^d$ duální k $f$}
+
+Celkovì probìhne $n$ iterací. Slo¾itost algoritmu je $\O(n^2m^2)$, nejnároènìj¹í jsou absorbce.
+
+\example 
+
+Mìjme funkci zadanou formulí
+$$
+ f(x_1, \dots, x_5) = x_1x_2 \lor x_1x_3 \lor x_1x_4 \lor x_2x_3 \lor x_2x_4x_5 
+$$
+
+Lze ovìøit, ¾e funkce je regulární. Iterace algoritmu budou následující: 
+\itemize\ibull
+    \: $i = 6$
+
+        jediný implikant, který obsahuje $x_5$ je $x_2x_4x_5$. Jeho
+        charakteristika je $01011$, tedy charakteristika \<MFP> je $01010$
+        (pøeklopíme $i-1$-tou
+        slo¾ku), a té odpovídá $x_1x_3x_5$ 
+    \: $i = 5$
+
+        polo¾ $x_5 = 1$ a absorbuj 
+
+        $f(x_1, x_2, x_3, x_4) = x_1x_2 \lor x_1x_3 \lor x_1x_4 \lor x_2x_3 \lor x_2x_4$
+
+        $$ 
+        \eqalign{
+        \<MTP > x_1x_4 \rightarrow 10011 & \rightarrow \<MFP > 10001 \rightarrow x_2x_3x_4 \cr
+        \<MTP > x_2x_4 \rightarrow 01011 & \rightarrow \<MFP > 01001 \rightarrow x_1x_3x_4 
+        }
+        $$
+        
+    \: $i = 4$
+
+        polo¾ $x_4 = 1$ a absorbuj 
+
+        $f(x_1, x_2, x_3) = x_1x_2$ 
+
+    \: $i = 3$
+
+        $f(x_1, x_2, x_3) = x_1x_2$ 
+
+    \: $i = 2$
+
+        $f(x_1, x_2) = x_1x_2$ 
+
+        $$ 
+        \<MTP > x_2 \rightarrow 01111 \rightarrow \<MFP > 00111 \rightarrow x_1x_2
+        $$
+
+\endlist
+
+Tedy duální formule má tvar  $(x_1 \lor x_2) \land (x_1 \lor x_3 \lor x_4) \land (x_2 \lor
+\lor x_3 \lor x_4) \land (x_1 \lor x_3 \lor x_5)$.
+        
+\medskip
+
+
+Jak je to se sílou promìnných?
+
+$$
+\eqalign{
+f^d(1, 0, \dots) &= x_3x_4 \lor x_3x_5 \cr
+f^d(0, 1, \dots) &= x_3x_4 
+}
+$$
+
+Tedy $x_1 \succeq_{f^d} x_2$. Lze ovìøit, ¾e síla promìnných zùstane
+i v ostatních pøípadech.
+
+\thmn{O regulárnosti duální funkce}
+Nech» $f$ je regulární boolovská funkce. Pak její duální formule $f^d$ je také regulární, navíc ke
+stejnému poøadí promìnných. 
+
+\proof
+
+BÚNO $i=1$, $j=2$. Pak $f^d(1, 0, x_3, \dots, x_n) = \neg f(0, 1, \neg x_3, \dots, \neg x_n) \ge \neg f(1, 0, \dots,  \neg x_n) = f^d(0, 1, \dots, \ x_n)$
+
+
+\chapterend
+ \input ../macros.tex
+
+\prednaska{5}{Prahové funkce}{}
+
+\defnn{Prahová funkce}
+Boolovská funkce $f(x_1, \dots, x_n)$ se nazývá \df{prahová} (lineárnì separabilní), pokud 
+$\exists v_1, \dots, v_n, p \in R$ takové, ¾e
+$$
+f(x_1, \dots, x_n) = 0 \iff \sum_{i=1}^{n} v_i x_i \leq p
+$$
+Tedy nadrovnina definovaná pomocí $v_1, \dots,v_n, p$ separuje 0 od 1.
+
+\nota{Separátor a separující struktura}
+\itemize\idot
+\: \df{Separátorem funkce $f$} nazýváme hyperrovinu $\sum_{i=1}^{n} v_i x_i = p$
+\: \df{Separující struktura funkce $f$} je $(n+1)$-tice $(v_1,\dots, v_n, p)$
+\endlist
+
+\thm
+Nech» $f(x_1, \dots, x_n)$ je prahová booleovská funkce se strukturou $(v_1,\dots, v_n, p)$.
+Mìjme dány libovolné indexy $i,j: 1 \leq i < j \leq n$.
+Potom platí:
+$$
+v_i \leq v_j \Rightarrow x_i \preceq_{f} x_j
+$$
+
+\proof
+Za jakých podmínek platí $x_i \preceq_{f} x_j$? Z definice $\preceq_{f}$ dostaneme:
+$$
+f(x_1,\dots,x_{i-1},0,\dots,x_{j-1},1,\dots,x_n) \geq f(x_1,\dots,x_{i-1},1,\dots,x_{j-1},0,\dots,x_n)
+$$
+\itemize\idot
+\: Levá strana je rovna 1 $\Leftrightarrow \sum_{k\neq i,j}^{n} v_k x_k + v_j > p$
+\: Pravá strana je rovna 1 $\Leftrightarrow \sum_{k\neq i,j}^{n} v_k x_k + v_i > p$
+\endlist
+Pokud je tedy pravá strana rovna 1 a zároveò platí $v_i \leq v_j$, musí být také levá strana rovna 1,
+co¾ pøímo z definice implikuje $x_i \preceq_{f} x_j$.
+
+\obs
+Obrácená implikace neplatí (napø. pøi $x_i \sim x_j$ se váhy nemusí rovnat).
+
+\cor
+\itemize\idot
+\: $v_i = v_j \Rightarrow x_i \simeq_{f} x_j$ 
+\: ka¾dá pozitivní prahová funkce je regulární
+\endlist
+
+\thm
+Ka¾dá prahová funkce je unátní (tj. monotónní v ka¾dé promìnné). Pøesnìji øeèeno:
+Pokud  $f(x_1, \dots, x_n)$ je prahová booleovská funkce se strukturou $(v_1,\dots, v_n, p)$ pak platí:
+
+\numlist\nparen
+\: 	\itemize\idot
+		\: Pokud je $v_i > 0$, potom je $f$ pozitivní v $x_i$.  
+		\: Pokud je $f$ pozitivní v $x_i$ a závisí na $x_i$, tak je $v_i > 0$.
+	\endlist
+\:	\itemize\idot
+		\: Pokud je $v_i < 0$, tak je $f$ negativní v $x_i$.      
+		\: Pokud je $f$ negativní v $x_i$ a závisí na $x_i$, tak je $v_i < 0$.
+	\endlist
+\:	Pokud $v_i = 0$, tak $f$ nezávisí na $x_i$.
+\endlist
+
+\proof
+Doká¾eme pouze 1. (pøípad 2. je obdobný a 3. plyne z definice regulárních
+funkcí):
+\itemize\idot
+\: Dle definice je $f$ pozitivní v $x_i$, pokud platí:
+$$
+f(\dots,0,\dots) \leq f(\dots,1,\dots)
+$$
+Levá strana je rovna 1 $\Leftrightarrow \sum_{j\neq i} v_j x_j > p$.
+Pravá strana je rovna 1 $\Leftrightarrow \sum_{j\neq i} v_j x_j + v_i > p$.
+Pokud je tedy $v_i > 0$ a levá strana je rovna 1, není mo¾né, aby byla pravá strana men¹í ne¾ 1.
+Tvrzení tedy platí.
+\: Pokud je $f$ pozitivní v $x_i$ a závisí na $x_i$, musí existovat takové ohodnocení promìnných, ¾e:
+$$
+0 = f(\dots,0,\dots) < f(\dots,1,\dots) = 1
+$$
+Levá strana nerovnosti je rovna 0 $\Leftrightarrow \sum_{j\neq i} v_j x_j \leq p$.
+Pravá strana je zase rovna 1 $\Leftrightarrow \sum_{j\neq i} v_j x_j + v_i > p$.
+Odtud nutnì plyne, ¾e $v_i > 0$.  
+\endlist 
+
+\thm
+Nech» $f(x_1, \dots, x_n)$ je prahová booleovská funkce se strukturou $(v_1,\dots, v_n, p)$, kde:
+$$
+\exists k\ \forall j=1,\dots,k : v_j \geq 0 \wedge \forall j=k+1,\dots,n : v_j < 0
+$$
+Potom booleovská funkce $g$ definovaná pøedpisem:
+$$
+g(x_1, \dots, x_n) = f(x_1, \dots,x_k,\overline{x}_{k+1},\dots,\overline{x}_n)
+$$
+je pozitivní prahová funkce se strukturou:
+$$
+(v_1, \dots, v_k, -v_{k+1}, \dots, -v_n,p-\sum_{i=k+1}^{n} v_i)
+$$
+
+\proof
+Pou¾ijeme pøedpis definující $g$ a definici prahové funkce:
+$$
+\eqalign{
+g(x_1,\dots,x_n) = 0 & \Leftrightarrow f(x_1, \dots,x_k,\overline{x}_{k+1},\dots,\overline{x}_n)=0 \cr
+& \Leftrightarrow \sum_{i=1}^{k}v_i x_i + \sum_{i=k+1}^{n} v_i (1- x_i) \leq p \cr
+& \Leftrightarrow \sum_{i=1}^{k}v_i x_i - \sum_{i=k+1}^{n} v_i x_i + \sum_{i=k+1}^{n} v_i \leq p \cr
+& \Leftrightarrow \sum_{i=1}^{k}v_i x_i - \sum_{i=k+1}^{n} v_i x_i \leq p - \sum_{i=k+1}^{n} v_i}
+$$
+
+\thm
+Nech» $f(x_1, \dots, x_n)$ je prahová booleovská funkce se strukturou $(v_1,\dots, v_n, p)$,
+která je celoèíselná (BÚNO - existuje-li nìjaká struktura, existuje i racionální struktura,
+kterou staèí pøenásobit spoleèným jmenovatelem).
+Potom $f^{d}$ je prahová booleovská funkce se strukturou $(v_1,\dots,v_n,\sum_{i=1}^{n} v_i - p - 1)$
+
+\proof
+$$
+\eqalign{
+f^{d}(x)=0 & \Leftrightarrow \neg f(\overline{x}) = 0 \cr
+& \Leftrightarrow f(\overline{x}) = 1 \cr
+& \Leftrightarrow \sum_{i=1}^{n}v_i(1-x_i) > p \cr
+& \Leftrightarrow \sum_{i=1}^{n}v_i x_i < \sum_{i=1}^{n} v_i - p \cr
+& \Leftrightarrow \sum_{i=1}^{n} v_i x_i \leq \sum_{i=1}^{n} v_i - p - 1 = p^{'}} 	
+$$
+Kde $p^{'}$ je nový práh pro doplòkovou prahovou funkci. 
+
+\cor
+Duální páry jsou v¾dy porovnatelné:
+\itemize\idot
+\: $p \leq p^{'} \Rightarrow f^{d} \leq f$
+\: $p \geq p^{'} \Rightarrow f^{d} \geq f$
+\endlist
+
+\chapterend
+
+\prednaska{6}{Rozpoznávání prahových funkcí}{}
+
+V první èásti kapitoly se zamìøíme na rozpozávání prahových funkcí. Ve zbytku se zamìøíme na úvod do SATu a uká¾eme algoritmus, který vyøe¹í 2-SAT v èase $\O(n)$.
+
+\medskip
+
+Pøedpokládáme, ¾e vstupní DNF je unární. Potom BÚNO platí, ¾e vstupní DNF je
+pozitivní (jinak nahradím negované promìnné novými). Máme triviálnì \<MTP>
+a známe algoritmus, který z \<MFP> vyrobí \<MTP>.
+ 
+
+\claim\id{threshold_eqn}
+
+ Nech» $x^1, \dots, x^q$ jsou \<MFP> funkce $f$ a $y^1, \dots, y^r$ jsou \<MTP> funkce $f$, pak
+ $f$ je prahová, právì kdy¾ systém nerovností 
+
+
+$$
+\eqalign{
+ \sum_{i=1}^{n}v_i x_i^j \le p & \qquad  1 \le j \le q \cr
+ \sum_{i=1}^{n}v_i y_i^j \ge p +1 & \qquad 1 \le j \le r \cr
+ v \ge 0
+}
+$$
+
+má øe¹ení $(v_1, \ldots, v_n, p)$.
+
+\proof
+
+Dùkaz vychází z toho, ¾e ka¾dý \<TP> (\<FP>) je obsa¾en v nìjakém \<MTP>
+(\<MFP>). $p+1$ mù¾u proto, ¾e v¾dy je tam $\varepsilon$-ová nerovnost, po
+vynásobení vhodnou konstantou ji zvét¹ím a¾ na 1.
+
+
+\algo{Rozpoznávání prahových funkcí}
+\algin{pozitivní funkce $f$}
+\: Otestuj regularitu $f$. Pokud $f$ není regulární, není ani prahová. 
+\: Zkonstruuj duální $f^d$ 
+\: Sestav soustavu rovnic dle tvrzení \ref{threshold_eqn} a vyøe¹.
+\: Existuje-li øe¹ení, je funkce prahová, jinak ne.
+\algout{rozhodnutí, zda je $f$ prahová}
+
+Test regularity umíme v èase $\O(n^2m^2)$, lze v $\O(n^2m)$ u¾itím vhodných
+datových struktur. Stejnì tak konstrukci duální funkce. Soustavu rovnic lze vyøe¹it
+v polynomiálním èase u¾itím lineárního programování.
+
+\rem
+Nalezení diskrétního, kombinatorického algoritmu, který by danou úlohu øe¹il, je otevøený problém.
+
+\vskip 0.5cm
+
+\sec{Úvod do SATu}
+
+K èemu je u¾iteèná úloha splnitelnosti CNF z hlediska umìlé inteligence?
+
+Mìjme model sestávající se 
+
+%$$
+%\vbox{
+%\offinterlineskip
+%\halign{ \qquad#\dotfill &  #  \vline & # \cr 
+%    d & dveøe & otevøené/zavøené \cr
+%}}$$
+
+$$\vbox{
+\offinterlineskip
+\halign{
+
+\qquad#\dotfill & # & #  \cr
+\hbox to 0.1\hsize{}\cr
+    $d$ & dveøe & otevøeno/zavøeno \cr
+    $s$ & siréna & houká/nehouká \cr
+    $a$ & majáèek & bliká/nebliká \cr
+    $m$ & monitor & zobrazuje/nezobrazuje dveøe $d$ \cr
+}}$$
+
+Definujme v nìm následující pravidla: 
+$$\vbox{
+\offinterlineskip
+\halign{
+
+\qquad# & #\hfill \cr
+\hbox to 0.1\hsize{}\cr
+    $d \rightarrow a$ &  pokud jsou dveøe otevøené, bliká majáèek \cr
+    $d \rightarrow m$ &  pokud jsou dveøe otevøené, zobrazují se na monitoru \cr
+    $s \rightarrow a$ & pokkud houká siréna, blíká majáèek \cr
+    $s \rightarrow m$ & pokud houká siréna, zobrazují se dveøe na monitoru \cr
+    $a \land m \rightarrow d$ & pokud bliká majáèek a dveøe se zobrazují na monitoru, jsou otevøené \cr
+    $a \land m \rightarrow s$ & pokud bliká majáèek a dveøe se zobrazují na monitoru, houká siréna \cr
+}}$$
+
+Pravidla lze pøepsat na $(\neg d \lor a)$, $(\neg d \lor m))$, $(\neg s \lor
+a)$, $(\neg s \lor m)$, $(\neg a \lor \neg m \lor d)$, $(\neg a \lor \neg
+m \lor s)$. V¹echna pravidla jsou splnìna právì tehdy, kdy¾ je odpovídající CNF
+splnìna. Model expertního systému odpovídá splòujícímu ohodnocení CNF.
+
+
+Odpovídání na dotazy: 
+
+\itemize\ibull
+    \: Otázka: Je pravda, ¾e pokud bliká majáèek, monitor zobrazuje dveøe ($a \rightarrow m$)?
+
+        Ekvivaletnì: je pravda, ¾e v ka¾dém modelu, kde $a=1$ zároveò platí, ¾e
+        $m=1$? Dosadíme do CNF pravidel $a=1$, $m=0$ a otestujeme SAT: $(\neg
+        d) \land (\neg s)$ je splnitelná formule, tedy odpovìï je NE.
+    
+    \: Otázka: Je pravda, ¾e jsou dveøe otevøené, houká siréna ($d \rightarrow s$)?
+
+        Dosadíme do CNF pravidel $d=1$, $s=0$ a otestujeme SAT. $(a) \land (s) \land (\neg a \lor \neg m)$ je nesplnitelná formule, tedy odpovìï je ANO.
+    \: Otázka: Je $a \rightarrow m$ platné pravidlo?
+
+
+$$
+\eqalign{
+    \F = 1 \implication & (a \rightarrow m) = 1 \cr
+                         & (\neg a \lor m) = 1 \cr
+    (\neg a \lor m) \implication & \F = 0 \cr
+}
+$$
+\todo zkontrolovat, zdá se mi to divné
+
+        Dosadíme do CNF pravidel $a=1$, $m=0$ a otestujeme SAT. $d = s = 1$ je model, formule je tedy splnitelná a odpovìï je NE.
+
+    \: Otázka: Dveøe jsou otevøené. Je potom pravda, ¾e pokud bliká majáèek, monitor zobrazuje dveøe ($a \rightarrow m$)?
+
+        ANO
+
+\endlist
+
+
+\vskip 1cm
+
+\h{2-SAT v øeèi DNF}
+
+Nejprve uká¾eme, ¾e je korektní se omezit pouze na formule, které neobsahují
+termy délky~1. Uká¾eme dvì varianty algoritmu, který vytvoøí ekvivalentní formuli,
+která jednotkové termy neobsahuje.
+
+\paran{Unit propagation}
+
+Idea: termy délky 1 mù¾u pøímo dosadit.
+\algo{Odstranìní termù délky 1}
+\algin{Formule $\F$ obsahující termy délky max. 2}
+\: Dokud je v $\F$ jednotkový term $u$: 
+\:: zafixuj $u = 0$, dosaï do $\F$
+\: Pokud vznikl prázdný tem, $\F$ není falzifikovatelná, jinak mám $\F'$ bez jednotkových termù
+\algout{Formule $\F$ obsahující termy délky právì. 2}
+\endalgo
+
+Algoritmus lze pøímoèaøe implementovat v èase $\O(ln)$, kde $l$ je poèet
+literálù a $n$ poèet promìnných. Uká¾eme, algoritmus, který propagaci provede v èase $\O(l)$. 
+
+\fig{../6-rozpoznavani-prahovych-funkci/unitpropagation.eps}{\epsfxsize}
+
+Zkonstruuju strukturu, viz obr., kde $x_1, \ldots, x_n$ jsou promìnné, $T_1,
+\ldots, T_n$ termy . Poté procházím frontu 1-prvkových termù. Pro ka¾dou jeho promìnnou projdu odpovídající øádek:
+Pokud v termu $i$ je negace, odstraním ji a zkontroluju, zda jsem nevytvoøil seznam délky 1.
+
+
+\chapterend
+
+\prednaska{7}{Falzifikovatelnost kvadratických funkcí}{}
+
+Nech» $\F$ na promìnných $x_1, \ldots, x_n$ je ryze kvadratická DNF-formule. Definujme orientovaný graf $G = (V, E)$: 
+$$
+\eqalign{
+    V & = \{x_1, \ldots, x_n, \overline{x_1}, \ldots, \overline{x_2}\}, \cr
+    E & = \{ (u, \overline{v}), (\overline{u}, v) \vert  \forall \hbox{ term }  uv\} 
+}
+$$
+
+\example
+
+$$
+\F = ab \lor b\overline{c} \lor \overline{b}\overline{c} \lor db \lor ad
+$$
+
+\fig{../7-kvadraficke-funkce/sat.eps}{\epsfxsize}
+
+\thm
+
+Ohodnocení $o: V \rightarrow \lbrace 0,1 \rbrace$
+odpovídá falsifikujícímu ohodnocení $\cal{F}$ právì tehdy, kdy¾:
+
+
+\numlist\nparen
+\: $\forall x \in V: o(x)\neq o(\bar{x})$
+\: $\exists x,y \in V: o(x)=1 \wedge o(y)=0 $ a v grafu existuje
+orientovaná cesta z $x$ do $y$
+\endlist
+
+\proof
+První podmínka øíká, ¾e promìnná a její negace musí dostat ka¾dá jinou hodnotuZ
+konstrukce ohodnocení plyne. Druhé ohodnocení odpovídá implikaci, která není
+lplnìna, ohodnocení tedy falzifikuje.
+
+\rem
+Pokud $a_1,\ldots,a_k$ tvoøí silnì souvislou kompomentu (SSK) grafu $G_{\cal{F}}$, tak také $\bar{a_1},\ldots,\bar{a_k}$ tvoøí SSK komponentu v $G_{\cal{F}}$ a naopak.
+
+\thm $\cal{F}$ je falsifikovatelná právì kdy¾ neexistuje ¾ádný vrchol $x \in V$ takový, ¾e $x$ a $\bar{x}$ patøí do stejné silnì souvislé komponenty v grafu $G_{\cal{F}}$.
+
+\proof
+\itemize\ibull
+\: ``$\implication$'' sporem: nech» jsou $x$ a $\bar{x}$ ve stejné SSK.
+Z toho vyplývá, ¾e pro ka¾dé ohodnocení promìnných existuje cesta v grafu $G_{\cal{F}}$ z 1 do 0.
+Podle pøedchozí vìty takové ohodnocení není falsifikující, $\F$ tedy není falsifikovatelná.
+
+\FIXME Zkontrolovat. Zdá se mi, ¾e algoritmus je psaný pro splnitelnost \<CNF>,
+nikoliv pro falzifikovatelnost \<DNF>. Sporem dokazuju, ¾e v grafu nevznikne
+cesta z 0 do 1, co¾ je ale pøesnì to, co pro falzifikovatelnost potøebuju.
+
+\: ``$\invimplication$'' konstruktivnì: Zkonstruujeme ohodnocení $o$ pro vrcholy splòující podmínky 1) a 2) z pøedchozí vìty.
+Postupujeme následovnì:
+	\numlist\nromanp
+	\: Graf SSK je acyklický $\Rightarrow$ existuje topologicky poslední komponenta (¾ádné hrany ven). Oznaème ji jako $C$.
+	\: V¹em literálùm v $C$ dáme hodnotu 1 ($\forall u \in C: o(u) = 1$), co¾ zároveò vynutí 0 v doplòkové komponentì ($\forall \bar{u} \in \bar{C}: o(\bar{u}) = 0$), která je díky dualitì cest topologicky první (¾ádné hrany dovnitø).
+	\: Pøedchozí dva kroky iterujeme.
+	\endlist
+
+\FIXME Zkontrolovat i toto. 
+
+Ovìøení funkènosti postupu - sporem: pøedpokládejme, ¾e nám pomocí vý¹e
+uvedeného postupu vznikla cesta z 1 do 0. 
+
+\fig{../7-kvadraficke-funkce/sat_proof.eps}{\epsfxsize}
+
+V okam¾iku, kdy $C_2 \assign 1$ je¹tì $C_1$ nebylo ohodnoceno. Ale
+díky dualitì musí existovat cesta z $\overline{C}_2$ do  $\overline{C}_1$,
+\fig{../7-kvadraficke-funkce/sat_proof_neg.eps}{\epsfxsize}
+co¾ ale znamená, ¾e $\overline{C}_2$ nebyla v okam¾iku ohodnocení topologicky poslední.
+
+\endlist
+
+
+\medskip
+
+\sec{Hornovské \<DNF>}
+
+\defnn{Hornovská formule}
+
+$\cal{F}$ je \df{hornovská} \<DNF> $\Leftrightarrow$ ka¾dý term z $F$ obsahuje nejvý¹e 1 negativní literál.
+Pokud obsahuje právì 1 negativní literál jde o èistì hornovskou funkci.
+
+\algo{Falzifikující ohodnocení pro Horn-SAT}
+\algin{Hornovská \<DNF> $\F$}
+\: spustit na $\F$ algoritmus Unit propagation
+\: pokud Unit propagation nalezne spor, je formule $\F$ falsifikovatelná - algoritmus pokraèuje, jinak $\F$ není falsifikovatelná - algoritmus konèí nezdarem
+\: Falsifikující ohodnocení formule $\F$ je slo¾eno z èásteèného ohodnocení získaného pøi Unit propagation v prvním kroku - zbytek jsou 0. 
+\algout{falsifikující ohodnocení formule $\F$ (existuje-li)}
+\endalgo
+
+
+\defn
+\<DNF> $\F$ je skrytì hornovská, pokud existuje podmno¾ina $S$ promìnných z $\F$, taková, ¾e po substituci $\forall x \in S: x \rightarrow \bar{x},\bar{x} \rightarrow x$ vznikne z $\F$ hornovská \<DNF> $\F^{'}$.
+
+\example 
+$$
+\F = x_1 \overline{x}_2 \overline{x}_3 \lor
+x_1 \overline{x}_4 \lor
+x_2 x_3 \overline{x}_4 \lor
+x_1 x_3 x_4 \lor
+x_1 \overline{x}_2 x_3 \lor
+\overline{x_1} \overline{x}_2 \overline{x_3}
+$$
+Po otoèení $x_2$, $x_4$ dostaneme hornovskou formuli.
+\chapterend
+
+\prednaska{8}{Rozpoznávání hornovských formulí, miminalizace}{}
+
+\defnn{Kvadartická \<DNF>}
+K \<DNF> $\F$   definujme \df{kvadratickou \<DNF> $\F_q$} následovnì:
+$$
+\{ uv \in \F_q \vert \exists \hbox{ term $T$ v $\F$, ¾e $u, v$ jsou literály v $T$} \}
+$$
+
+\lemma
+$\F$ je hornovská $\iff$ $\F_q$ je falzifikována vektorem $(0, \dots, 0)$
+
+\proof 
+
+\itemize\ibull
+\: ``$\implication$'': $\F$ hornovská $\implication$ $\F_q$ hornovská
+$\implication$ $\F_q$ obsahuje max. 1 negativní literál v termu $\implication$
+$\F_q$ obsahuje alespoò 1 pozitivní literál v termu (je ryze kvadratická)
+$\implication$ $(0, \ldots, 0)$ ji falzifikuje.
+\: ``$\invimplication$'': $(0, \ldots, 0)$ falzifikuje $\F_q$ $\implication$
+$\not\exists$ term v $\F_q$ obsahující dva negativní literály $\implication$ $\F$ je hornovská
+\endlist
+
+\lemma\id{hornsub}
+ $F$ je skrytì hornovská $\iff$ $\F_q$ je falzifikovatelná. Navíc pokud $t$ je pravd. ohodnocení falzifikující $\F_q$, tak substituce
+
+$$
+\eqalign{
+ & x \rightarrow \overline{x} \hbox{ pokud $t(x) = 0$} \cr
+ & x \rightarrow x \hbox{ pokud $t(x) = 1$} 
+}
+$$
+transformuje $\F$ na její hornovskou verzi $\F'$.
+
+\proof 
+
+\itemize\ibull
+    \: ``$\implication$'': $\F$ skrytì hornovská $\implication$ $\exists $ mno¾ina promìnných $S: \F'$
+vzniklá z $\F$ komplementací promìnných v $S$ je hornovská $\implication$ $(0,
+\ldots, 0)$ falzifikuje $\F_q'$ $\implication$  $\F_q$ je falzifikována
+vektorem vzniklým z $(0, \ldots, 0)$ nahrazením nul jednièkami na pozicích
+odpovídajících promìnným v $S$.
+\: ``$\invimplication$'': $\F_q$ falzifikovatelná, má falzifikující ohodnocení $t$
+$\implication$ $\F_q'$ vzniklá z $\F_q$ komplementací promìnnýých, pro které
+$t(x) = 1$ je falzifikována $(0, \ldots, 0)$ $\implication$ $\F_q'$ je
+hornovská $\implication$ $\F$ je skrytì hornovská.
+\endlist
+
+
+Lemma nám dává pøímoèarý $\O(nl)$ algoritmus, proto¾e $|\F_q| \in \O(nl)$, kde $|F| = l$, $n$ je poèet promìnných $\F$ a $l$ poèet jejich literálù.
+
+\cor 
+Nech» $\F$ je kvadratická \<DNF>. Pak $\F$ je falzifikovatelná
+$\implication$ $\F$ je skryté hornovská. Pro ryze kvadratické platí ekvivalence
+(pak dokonce $\F = \F_q$). Abychom dostali $\O(n)$ algoritmus, nahradíme \<DNF>
+$\F$ za \<DNF> $\F'$ takto: 
+
+$$
+\forall u_1, \ldots, u_k \hbox{ term v } \F \rightarrow u_1y_1 \lor y_1u_2y_2 \lor \overline{y}_2u_3y_4 \lor \ldots \lor \overline{y}_{k-2}u_{k-1}y_{k-1} \lor \overline{y}_{k-1}u_k 
+$$ 
+tedy 
+$$
+\F_p = \F_q' = \bigvee_{c \in \F, |C| \ge 2} C_p
+$$
+kde 
+$$
+C_p = u_1y_1^C \lor  \bigvee_{1 \le i \le k} (\overline{y}_{i-1}^Cu_i \lor {y}_{i-1}^Cy_i^C \lor u_iy_i^C) \lor \overline{y}_{k-1}^Cu_k
+$$
+
+Chceme ukázat: $\F_q$ je falzifikovatelná $\iff$ $\F_p$ je falzifikovatelná,
+pøièem¾ $\vert C_p \vert = 3k-2$.
+
+\lemma 
+Nech» $t$ je falzifikující ohodnocení $\F_p$. Pak $t_{|x_1, \ldots, x_n}$ je falzifikující ohodnocení $\F_q$.
+
+\proof
+
+Nech» $u_iu_j$ je libovolný term v $\F_q$ $\implication$ $\exists$ term $c$
+v $\F$, ¾e $C = u_1\ldots u_i\ldots u_j\ldots u_k$ $\implication$ $u_iy_i$,
+$y_i\overline{y}_{i+1}$, $\overline{y}_{i+1}y_{i+2}$,
+$\overline{y}_{i+1}y_{i+2}$, $\ldots$, $\overline{y}_{j-2}y_{j-1}$,
+$\overline{y}_{j-1}y_{j} \in \F_p$. V ohodnocení $t$ jsou v¹echny tyto termy
+falizikovány $\implication$ alespoò jeden z $u_i$, $u_j$ je falzifikován také. 
+
+\cor 
+$f$ falzifikovatelná $\iff$ $\F_q$ falzifikovatelná.
+
+\lemma
+$\F_q$ falzifikovatelná $\implication$ $\F_p$ falzifikovatelná.
+
+\proof 
+
+Nech» $t$ falzifikuje $\F_q$ a nech» $ c = u_1 \ldots u_k$ je term v $\F$. $c_q = \bigvee(u_iu_j)$, tj. $\F_q = 0 \implication C_q = 0 \implication$ nejvý¹e jeden z $u_i$, $1 \le i \le k$ má hodnotu 1. Nech» je to $u_l$.
+Dodefinujeme-li $t(y_i) = 1$, $1 \le i \le l$ $\implication$ $C_p = 0$ na dodefinovaném $t$.
+
+\cor \<DNF> $\F$ je skrytì hornovská $\iff$ $\F_p$ je falzifikovatelná. Navíc  pokud $t$ je falzifikující ohodnocení $\F_p$, tak substituce z \ref{hornsub} transforumje $\F$ na hornovskou \<DNF> $\F'$. 
+
+\algo{Rozpoznávací algoritmus pro skrytì hornovské \<DNF>}
+\algin{formule $\F$}
+\: z $\F$ zkonstruuj $\F_p$
+': Pokud je $\F_p$ prázdná í$\F$ obsahuje jen lineární termy), pak $\F$ je hornovská.
+\: Pomocí 2-SATu na $\F_p$ rozhodni falzifikovatelnost $\F_p$: 
+\:: NE: $\F$ není skrytì hornovská 
+\:: ANO: $\F$ je skrytì hornovská a falzifikující ohodnocení definuje transformaci $\F$ na hornovskou $\F'$    
+\algout{rozhodnutí, zda $\F$ je skrytì hornovská} 
+
+\vskip 0.5cm
+
+\sec{Minimalizace formy boolovských funckí}
+
+DNF $\F$ a èíslo $k \in M$
+
+Otázka: $\exists \<DNF> \F'$ taková, ¾e $\F$ a $\F'$ reprezentují stejnou bool. funkci a $\vert \F' \vert \le k$ (nìkolik verzí podle definice $\vert \F' \vert$, napø. poèet literálù, poèet termù, \dots). 
+
+Obecnì NP-tì¾ké - pro $k = 1$ se tím dá ovìøovat falzifikovatelnost. Uká¾eme, ¾e NP-tì¾ké i pro hornovské \<DNF>, polynomiální pro kvadratické \<DNF>.
+
+\lemma
+Nech» je dána hornovská \<DNF> $\F$ obsahující $l$ literálù. Potom lze v èase $\O(l^2)$ nalézt primární a ireduntantní \<DNF> $\F'$ reprezentující stejnou funkci jako $\F$.
+
+
+\chapterend
+
+\prednaska{9}{Minimalizace kvadratických funkcí}{}
+
+V této pøedná¹ce doká¾eme, jak z kvadratické DNF vyrobit ekvivalentní DNF
+minimální délky (a» u¾ do poètu termù nebo literálù).
+
+\lemma
+Nech» $\F_1$, $\F_2$ jsou dvì primární hornovské DNF reprezentující tuté¾
+funkci $f$ a nech» $\F_1'$, $\F_2'$ jsou èistì hornovské èásti $\F_1$ resp.
+$\F_2$. Pak $\F_1'$ i $\F_2'$ reprezentují tuté¾ funkci $f_H$, nazýváme ji
+èistì hornovská komponenta $f$.
+
+\proof 
+Uva¾me, jak u hornovských formulí vypadá konsenzus.
+
+
+$$
+\eqalign{
+ Cons(\<ÈH>, \<ÈH>) & = ÈH \hbox{ (ÈH je èistì hornovská formule)} \cr
+ Cons(\<ÈH>, \<POS>) & = POS \hbox{ (POS je pozitivní formule)} \cr
+ Cons(\<POS>, \<POS>) & \dots \hbox{nelze}
+}
+$$
+
+Nech» $\F$ je kanonická DNF funkce $f$. Její kanonickou èást lze vygenerovat
+z hornovských èástí $\F_1$, $\F_2$. $\F'_1$, $\F'_2$ mají stejnou mno¾inu
+primárních implikantù, tedy reprezentují stejnou funkci.
+
+Proè je potøeba, aby $\F_1$ i $\F_2$ byli primární? Pokud $\F_1'$ primání, pak $\F'_1 \subset \F$, toté¾ platí pro $\F'_2$, a tedy
+v¹e v $\F$ lze vygenerovat pomocí konsenzù jak z $\F'_1$, tak z $\F'_2$.
+Naopak, uvá¾íme li dvojici pozitivní formule, pozitivní formule + negativní
+literál absorbovaný pozitivními literály, zjistíme, ¾e pro ni závìr lemmatu
+neplatí.
+
+\lemma\id{positive_parts}
+Nech» $\F_1$, $\F_2$ jsou dvì primární ireduntantní hornovské DNF
+reprezentující tuté¾ funkci. Nech» $\F'_1$, $\F'_2$ jsou pozitivní èásti $\F_1$
+a $\F_2$. Pak $\F_1$ a $\F_2$ mají stejný poèet termù.
+
+\proof Nech» $G_F(V, E)$ je orientovaný graf pro DNF $\F$, kde 
+$$
+\eqalign{
+ V & = \{ T | \hbox{ $T$ je pozitivní primární implikant $\F$ } \} \cr
+ E & = \{ (T_1, T_2) | \hbox{ $T_1$ je implikantem $T_2 \cup \F_H$  } \},
+}
+$$ 
+kde $\F_H$ je funkce reprezentující èistì hornovskou èást $\F$. Tedy hrany
+grafu jsou tam, kde z $T_1, \F_H$ lze pomocí konsenzu odvodit $T_2$.
+
+Vlastnosti $G_\F$: 
+
+\itemize\ibull
+    \: tranzitinvì uzavøený -- pokud $(T_1, T_2), (T_2, T_3)$ jsou hrany, pak $T_3$ je implikant $T_2
+        \cup \F$ a $T_2$ je implikant $T_1 \cup \F_H$, tj. $T_3$ je implikant
+        $T_1 \cup \F_H \implication (T_1, T_3)$ je hrana.
+    \: pokud $\F$ iredundantní a $(T_1, T_2) \in E$, nemù¾e nastat, aby $T_1,
+    T_2 \in \F$, proto¾e pak by z $T_1 \cup \F_H$ ¹la odvodit $\F_2$.
+\endlist
+
+
+\claim
+Nech» $T$ je pozitivní primární implikant hornovské funkce f a nech» $\F$ je
+primární reprezentace $\F$. Pak existuje pozitivní term $T' \in \F$ takový, ¾e
+$T$  je implikant $T' \cup \F_H$, kde $\F_H$ je èistì hornovská èást $\F$.
+
+\proof 
+Rozmy¹lením, co jsou silnì souvislé komponenty grafu.
+
+
+\algo{Minimalizace kvadratické DNF délky $l$}
+\algin{kvadratická \<DNF> $\F$}
+\: z $\F$ vyrob primární iredundantní \<DNF> $\F_1$ (je také kvadratická)
+\: rozdìl $\F_1$ na $\F_1^L$ z lineárních termù a a $\F_1^Q$  z ryze
+kvadratických termù. $\F_1^L$ a $\F_1^Q$ jsou \<DNF> na disjunktních mno¾inách
+promìnných (pokud $x$ je v $\F_1^L$, nemù¾e být v $\F_1^Q$ $xy$ (spor
+s primárností) ani $\overline{x}y$ (lze provést konsenzus). Dále $\F_1^L$ je minimální.
+\: Pokud $\F_1^Q$ není falzifikovatelná, pak minimální \<DNF> ekvivalentní
+s $\F$ je $\F_1^L$ nebo 1, pokud je  $\F_1^L$ prázdná.
+\: $\F_1^Q$ je skrytì hornovská, lze ji tedy pøevést na její hornovskou verzi
+$\F_2$.
+\: rozdìlíme $\F_2$ na $\F_2^H$ (èistì hornovská èást) a $\F_2^P$ (pozitivní
+èást). Díky \ref{positive_parts} je $\F_2^P$ minimální, nebo» v¹echny primární
+implikanty jsou ryze kvadratické. Staèí tedy minimalizovat $\F_2^H$ (èistì
+hornovská ryze kvadratická formule bez primárních implikantù)
+\: definujme $G_{F_2^H}$ takto: 
+$$
+\eqalign{
+ V & \ldots \hbox{ promìmnné } \cr
+ E & = \{ (x, y) | \hbox{ $x, \overline{y}$ je term v $\F_2^H$  } \}.
+}
+$$
+Konsenzus v  $\F_2^H$ odpovídá tranzitivitì na $G_{F_2^H}$ $\implication$
+$\F_2^H$ a $\tilde{F}_2^H$ jsou logicky ekvivalentní právì tehdy, kdy¾
+$G_{F_2^H}$ $G_{\tilde{F}_2^H}$ mají stejný tranzitivní uzávìr (jen¾ odpovídá
+kanonické \<DNF>. Tím je problém pøeveden na hledání tranzitivní redukce
+orientovaného grafu.
+\algout{kvadratická  \<DNF> ekvivalentní s $\F$, její¾ délka je nejmen¹í mo¾ná}
+
+\algo{Tranzitivní redukce orientovaného grafu.}
+\algin{graf $G$}
+\: najdi v¹echny silnì souvislé kompomenty grafu
+\: ka¾dou nahrad jedním cyklem, co¾ je minimální graf co do poètu hran potøebný
+k zají¹tìní souvislosti. Obecnì je¹tì musím øe¹it hrany mezi silnì souvislými
+kompomentami, ale pro minimalizaci mi iredundantnost zaji¹»uje, ¾e takové hrany
+v grafu neexistují.
+\algin{graf minimální co poètu hran, který má stejný tranzitivní uzávìr jako
+$G$}
+
+\rem
+Najít minimální podgraf (resp. ``\<podDNF>'') je \<NP>-tì¾ké.
+
+\chapterend
+
+\prednaska{10}{NP-úplnost minimalizace hornovských funkcí}{}
+
+Cílem této kapitoly je ukázat, ¾e minimalizace je \<NP> tì¾ké u¾ pro èistì
+hornovské formule.
+
+\nota
+Ka¾dý term v hornovské klauzuli má tvar $a_1 \land a_2 \land \ldots \land a_k
+\land \overline{b} \equiv \neg [ a_1 \land a_2 \land \ldots \land a_k
+\rightarrow b ]$. Promìnným $a_i$ øíkáme \df{podcíle}, promìnnou $b$ oznaèujeme
+lako \df{hlavu} termu.
+
+\algo{Forward-chaining}
+\algin{èistì hornovská \<DNF> $\F$, podmno¾ina jejich promìnných $M$}
+\: $S \assign M$
+\: dokud v $\F$ existuje term, ¾e $\<podcíle>(T) \subseteq S$ a $\<hlava>(T)
+\not\in S$, tak $S \assign S \cup \{ \<hlava>(T) \}$
+\: vydej $S = FC_\F(M)$
+\algout{mno¾ina promìnných $FC_\F(M)$}
+
+\claim Èistì hornovský term $\bigvee_{x \in A} x \land \overline{y}$ je
+implikantem funkce reprezentující èistì hornovskou \<DNF> $\F$ právì
+tehdy, kdy¾ $y \in FC_\F(A)$.
+
+\proof 
+
+``$\implication$'': Nech» $y \not\in FC_\F(A)$. Pak ohodnocení $x = 1$, pokud
+$x \in FC_\F (A)$ a $ x = 0 $ jinak dává $T = 1$ a pøitom toto ohodnocení
+falzifikuje $\F$, proto¾e aby $\F = 1$ , musel by v $\F$ být term $T$ takový,
+¾e $\<podcíle>(T) \subseteq FC(A)$ a $y \not\in FC(A)$, co¾ je spor, tedy $T$
+není implikant.
+
+``$\invimplication$'': Nech» $y \in FC(A)$. Lze ukázat indukcí, dle poètu
+pøidání v dobì 2, ¾e $\bigwedge_{x \in A} \cup \overline{y}$ je implikant
+$\F$.
+
+\defnn{\<SET-COLOR> }
+Problém \<SET-COLOR>  patøí mezi známé \<NP>-úplné problémy. Nech» je dané $ S = \{x_1,
+\ldots, x_n \}$, $S_1, \ldots, S_m \subseteq S$, takové, ¾e $\bigcup_{i = 1}^m
+S_i = S$ a $k \in N$. Otázka zní: existují indexy $i_1, \ldots, i_k$
+takové, ¾e $\bigcup_{i = 1}^k S_{ij} = S$?
+
+\algo{Pøevod \<SET-COLOR> na minimalizaci hornovské formule}
+
+Definujme promìnné: $x_1, \ldots, x_k, S_1, \ldots, S_m, T$. Formule bude
+obsahovat tyto termy: 
+\numlist\nalpha
+\: $T\overline{S}_i$, $1 \le i \le m$
+\: $S_i\overline{x_j}$, $1 \le i \le m, x_j \in S_i$
+\: $x_1 \ldots x_n \overline{S}_i$, $1 \le i \le m$
+\endlist
+
+\fig{../10-minimalizace/minimalizace.eps}{\epsfxsize}
+
+\itemize\ibull
+    \: hrany $x_1 \ldots x_n \overline{S}_i$ jsou pro pøehlednost vynechány,
+    nakreslena je jen pro $S_1$
+    \: pokud jsou dvì èistì hornovské formule ekvivalentní, mají stejnou
+    mno¾inu hlav
+    \: pomocé forward-chainngu se bez pou¾ití $T$ z $S_i$ dostaneme jen jeho
+    promìnných, do ostatních $x_i$ ne
+    \: rozmy¹lením a koukáním na garf dokonèíme pøevod
+\endlist
+
+\rem
+Miminalizace je tì¾ká u¾ pro kubické hornovské formule, ale dùkaz je
+komplikovanìj¹í.
+
+\chapterend

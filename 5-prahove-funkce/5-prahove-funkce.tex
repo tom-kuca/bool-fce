@@ -1,0 +1,133 @@
+ \input ../macros.tex
+
+\prednaska{5}{Prahové funkce}{}
+
+\defnn{Prahová funkce}
+Boolovská funkce $f(x_1, \dots, x_n)$ se nazývá \df{prahová} (lineárnì separabilní), pokud 
+$\exists v_1, \dots, v_n, p \in R$ takové, ¾e
+$$
+f(x_1, \dots, x_n) = 0 \iff \sum_{i=1}^{n} v_i x_i \leq p
+$$
+Tedy nadrovnina definovaná pomocí $v_1, \dots,v_n, p$ separuje 0 od 1.
+
+\nota{Separátor a separující struktura}
+\itemize\idot
+\: \df{Separátorem funkce $f$} nazýváme hyperrovinu $\sum_{i=1}^{n} v_i x_i = p$
+\: \df{Separující struktura funkce $f$} je $(n+1)$-tice $(v_1,\dots, v_n, p)$
+\endlist
+
+\thm
+Nech» $f(x_1, \dots, x_n)$ je prahová booleovská funkce se strukturou $(v_1,\dots, v_n, p)$.
+Mìjme dány libovolné indexy $i,j: 1 \leq i < j \leq n$.
+Potom platí:
+$$
+v_i \leq v_j \Rightarrow x_i \preceq_{f} x_j
+$$
+
+\proof
+Za jakých podmínek platí $x_i \preceq_{f} x_j$? Z definice $\preceq_{f}$ dostaneme:
+$$
+f(x_1,\dots,x_{i-1},0,\dots,x_{j-1},1,\dots,x_n) \geq f(x_1,\dots,x_{i-1},1,\dots,x_{j-1},0,\dots,x_n)
+$$
+\itemize\idot
+\: Levá strana je rovna 1 $\Leftrightarrow \sum_{k\neq i,j}^{n} v_k x_k + v_j > p$
+\: Pravá strana je rovna 1 $\Leftrightarrow \sum_{k\neq i,j}^{n} v_k x_k + v_i > p$
+\endlist
+Pokud je tedy pravá strana rovna 1 a zároveò platí $v_i \leq v_j$, musí být také levá strana rovna 1,
+co¾ pøímo z definice implikuje $x_i \preceq_{f} x_j$.
+
+\obs
+Obrácená implikace neplatí (napø. pøi $x_i \sim x_j$ se váhy nemusí rovnat).
+
+\cor
+\itemize\idot
+\: $v_i = v_j \Rightarrow x_i \simeq_{f} x_j$ 
+\: ka¾dá pozitivní prahová funkce je regulární
+\endlist
+
+\thm
+Ka¾dá prahová funkce je unátní (tj. monotónní v ka¾dé promìnné). Pøesnìji øeèeno:
+Pokud  $f(x_1, \dots, x_n)$ je prahová booleovská funkce se strukturou $(v_1,\dots, v_n, p)$ pak platí:
+
+\numlist\nparen
+\: 	\itemize\idot
+		\: Pokud je $v_i > 0$, potom je $f$ pozitivní v $x_i$.  
+		\: Pokud je $f$ pozitivní v $x_i$ a závisí na $x_i$, tak je $v_i > 0$.
+	\endlist
+\:	\itemize\idot
+		\: Pokud je $v_i < 0$, tak je $f$ negativní v $x_i$.      
+		\: Pokud je $f$ negativní v $x_i$ a závisí na $x_i$, tak je $v_i < 0$.
+	\endlist
+\:	Pokud $v_i = 0$, tak $f$ nezávisí na $x_i$.
+\endlist
+
+\proof
+Doká¾eme pouze 1. (pøípad 2. je obdobný a 3. plyne z definice regulárních
+funkcí):
+\itemize\idot
+\: Dle definice je $f$ pozitivní v $x_i$, pokud platí:
+$$
+f(\dots,0,\dots) \leq f(\dots,1,\dots)
+$$
+Levá strana je rovna 1 $\Leftrightarrow \sum_{j\neq i} v_j x_j > p$.
+Pravá strana je rovna 1 $\Leftrightarrow \sum_{j\neq i} v_j x_j + v_i > p$.
+Pokud je tedy $v_i > 0$ a levá strana je rovna 1, není mo¾né, aby byla pravá strana men¹í ne¾ 1.
+Tvrzení tedy platí.
+\: Pokud je $f$ pozitivní v $x_i$ a závisí na $x_i$, musí existovat takové ohodnocení promìnných, ¾e:
+$$
+0 = f(\dots,0,\dots) < f(\dots,1,\dots) = 1
+$$
+Levá strana nerovnosti je rovna 0 $\Leftrightarrow \sum_{j\neq i} v_j x_j \leq p$.
+Pravá strana je zase rovna 1 $\Leftrightarrow \sum_{j\neq i} v_j x_j + v_i > p$.
+Odtud nutnì plyne, ¾e $v_i > 0$.  
+\endlist 
+
+\thm
+Nech» $f(x_1, \dots, x_n)$ je prahová booleovská funkce se strukturou $(v_1,\dots, v_n, p)$, kde:
+$$
+\exists k\ \forall j=1,\dots,k : v_j \geq 0 \wedge \forall j=k+1,\dots,n : v_j < 0
+$$
+Potom booleovská funkce $g$ definovaná pøedpisem:
+$$
+g(x_1, \dots, x_n) = f(x_1, \dots,x_k,\overline{x}_{k+1},\dots,\overline{x}_n)
+$$
+je pozitivní prahová funkce se strukturou:
+$$
+(v_1, \dots, v_k, -v_{k+1}, \dots, -v_n,p-\sum_{i=k+1}^{n} v_i)
+$$
+
+\proof
+Pou¾ijeme pøedpis definující $g$ a definici prahové funkce:
+$$
+\eqalign{
+g(x_1,\dots,x_n) = 0 & \Leftrightarrow f(x_1, \dots,x_k,\overline{x}_{k+1},\dots,\overline{x}_n)=0 \cr
+& \Leftrightarrow \sum_{i=1}^{k}v_i x_i + \sum_{i=k+1}^{n} v_i (1- x_i) \leq p \cr
+& \Leftrightarrow \sum_{i=1}^{k}v_i x_i - \sum_{i=k+1}^{n} v_i x_i + \sum_{i=k+1}^{n} v_i \leq p \cr
+& \Leftrightarrow \sum_{i=1}^{k}v_i x_i - \sum_{i=k+1}^{n} v_i x_i \leq p - \sum_{i=k+1}^{n} v_i}
+$$
+
+\thm
+Nech» $f(x_1, \dots, x_n)$ je prahová booleovská funkce se strukturou $(v_1,\dots, v_n, p)$,
+která je celoèíselná (BÚNO - existuje-li nìjaká struktura, existuje i racionální struktura,
+kterou staèí pøenásobit spoleèným jmenovatelem).
+Potom $f^{d}$ je prahová booleovská funkce se strukturou $(v_1,\dots,v_n,\sum_{i=1}^{n} v_i - p - 1)$
+
+\proof
+$$
+\eqalign{
+f^{d}(x)=0 & \Leftrightarrow \neg f(\overline{x}) = 0 \cr
+& \Leftrightarrow f(\overline{x}) = 1 \cr
+& \Leftrightarrow \sum_{i=1}^{n}v_i(1-x_i) > p \cr
+& \Leftrightarrow \sum_{i=1}^{n}v_i x_i < \sum_{i=1}^{n} v_i - p \cr
+& \Leftrightarrow \sum_{i=1}^{n} v_i x_i \leq \sum_{i=1}^{n} v_i - p - 1 = p^{'}} 	
+$$
+Kde $p^{'}$ je nový práh pro doplòkovou prahovou funkci. 
+
+\cor
+Duální páry jsou v¾dy porovnatelné:
+\itemize\idot
+\: $p \leq p^{'} \Rightarrow f^{d} \leq f$
+\: $p \geq p^{'} \Rightarrow f^{d} \geq f$
+\endlist
+
+\bye

@@ -1,0 +1,70 @@
+\input ../macros.tex
+
+\prednaska{10}{NP-úplnost minimalizace hornovských funkcí}{}
+
+Cílem této kapitoly je ukázat, ¾e minimalizace je \<NP> tì¾ké u¾ pro èistì
+hornovské formule.
+
+\nota
+Ka¾dý term v hornovské klauzuli má tvar $a_1 \land a_2 \land \ldots \land a_k
+\land \overline{b} \equiv \neg [ a_1 \land a_2 \land \ldots \land a_k
+\rightarrow b ]$. Promìnným $a_i$ øíkáme \df{podcíle}, promìnnou $b$ oznaèujeme
+lako \df{hlavu} termu.
+
+\algo{Forward-chaining}
+\algin{èistì hornovská \<DNF> $\F$, podmno¾ina jejich promìnných $M$}
+\: $S \assign M$
+\: dokud v $\F$ existuje term, ¾e $\<podcíle>(T) \subseteq S$ a $\<hlava>(T)
+\not\in S$, tak $S \assign S \cup \{ \<hlava>(T) \}$
+\: vydej $S = FC_\F(M)$
+\algout{mno¾ina promìnných $FC_\F(M)$}
+
+\claim Èistì hornovský term $\bigvee_{x \in A} x \land \overline{y}$ je
+implikantem funkce reprezentující èistì hornovskou \<DNF> $\F$ právì
+tehdy, kdy¾ $y \in FC_\F(A)$.
+
+\proof 
+
+``$\implication$'': Nech» $y \not\in FC_\F(A)$. Pak ohodnocení $x = 1$, pokud
+$x \in FC_\F (A)$ a $ x = 0 $ jinak dává $T = 1$ a pøitom toto ohodnocení
+falzifikuje $\F$, proto¾e aby $\F = 1$ , musel by v $\F$ být term $T$ takový,
+¾e $\<podcíle>(T) \subseteq FC(A)$ a $y \not\in FC(A)$, co¾ je spor, tedy $T$
+není implikant.
+
+``$\invimplication$'': Nech» $y \in FC(A)$. Lze ukázat indukcí, dle poètu
+pøidání v dobì 2, ¾e $\bigwedge_{x \in A} \cup \overline{y}$ je implikant
+$\F$.
+
+\defnn{\<SET-COLOR> }
+Problém \<SET-COLOR>  patøí mezi známé \<NP>-úplné problémy. Nech» je dané $ S = \{x_1,
+\ldots, x_n \}$, $S_1, \ldots, S_m \subseteq S$, takové, ¾e $\bigcup_{i = 1}^m
+S_i = S$ a $k \in N$. Otázka zní: existují indexy $i_1, \ldots, i_k$
+takové, ¾e $\bigcup_{i = 1}^k S_{ij} = S$?
+
+\algo{Pøevod \<SET-COLOR> na minimalizaci hornovské formule}
+
+Definujme promìnné: $x_1, \ldots, x_k, S_1, \ldots, S_m, T$. Formule bude
+obsahovat tyto termy: 
+\numlist\nalpha
+\: $T\overline{S}_i$, $1 \le i \le m$
+\: $S_i\overline{x_j}$, $1 \le i \le m, x_j \in S_i$
+\: $x_1 \ldots x_n \overline{S}_i$, $1 \le i \le m$
+\endlist
+
+\fig{minimalizace.eps}{\epsfxsize}
+
+\itemize\ibull
+    \: hrany $x_1 \ldots x_n \overline{S}_i$ jsou pro pøehlednost vynechány,
+    nakreslena je jen pro $S_1$
+    \: pokud jsou dvì èistì hornovské formule ekvivalentní, mají stejnou
+    mno¾inu hlav
+    \: pomocé forward-chainngu se bez pou¾ití $T$ z $S_i$ dostaneme jen jeho
+    promìnných, do ostatních $x_i$ ne
+    \: rozmy¹lením a koukáním na garf dokonèíme pøevod
+\endlist
+
+\rem
+Miminalizace je tì¾ká u¾ pro kubické hornovské formule, ale dùkaz je
+komplikovanìj¹í.
+
+\bye

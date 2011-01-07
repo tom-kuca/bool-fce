@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+foreach my $f (@ARGV) {
+	my $d = $f;
+	$d =~ s@/[^/]*$@/@;
+	open X, $f or die;
+	while (<X>) {
+		/^\\input .*macros\.tex/ && next;
+		/^\\references/ && next;
+		/^\\bye/ && last;
+		s@\\(figure|fig|inlinefig|epsfbox){([^}]+)}@\\$1\{$d$2}@g;
+		s@\\(twofigures){([^}]+)}({[^}]+}{[^}]+}){([^}]+)}@\\$1\{$d$2}$3\{$d$4}@g;
+		print;
+	}
+	close X;
+	print "\\chapterend\n";
+}

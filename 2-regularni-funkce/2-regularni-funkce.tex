@@ -1,0 +1,104 @@
+\input ../macros.tex
+
+\prednaska{2}{Monotónní a regulární funkce}{}
+
+V~této kapitole zavedeme pojmy monotónní a regulární funkce a s tím související pojmy.
+
+\sec{Monotónní booleovské funkce}
+
+\defn
+
+Funkce $f$ je \df{pozitivní v promìnné $x_i$}, pokud $\forall x_1,\ldots,x_{i-1},x_{i+1},\ldots,x_n$ platí:
+
+$$
+f(x_1,\ldots,x_{i-1},1,x_{i+1},\ldots,x_n)\geq f(x_1,\ldots,x_{i-1},0,x_{i+1},\ldots,x_n)
+$$
+
+Obdobnì pokud je funkce $f$ \df{negativní v promìnné $x_i$} (pouze opaèná nerovnost):
+
+$$
+f(x_1,\ldots,x_{i-1},1,x_{i+1},\ldots,x_n)\leq f(x_1,\ldots,x_{i-1},0,x_{i+1},\ldots,x_n)
+$$
+
+\obs 
+Pokud DNF formule $\F$ neobsahuje ¾ádný negovaný literál $x_i$,
+reprezentuje booleovskou funkci, která je \df{pozitivní v $x_i$}. Tvrzení platí
+i obrácenì, pokud se omezíme pouze na \df{primární} DNF.
+
+\claim
+Nech» $f$ je pozitivní v $x_i$ a nech» $T$ je primární implikant $f$. Potom $T$ neobsahuje $\bar{x_i}$.
+
+\proof
+Sporem, nech» $A\overline{x}_i$ je primární implikant funkce $f$. Pøeèíslujeme
+promìnné tak, aby $A$ obsahovala právì jenom $x_1, \ldots, x_{i-1}$. $\forall
+x_{i+1}, \cdots, x_n$ platí $A \overline{x}_i$ je implikant (díky
+$1 = f(\underbrace{0, 1, \cdots}_{A}, \underbrace{0}_{x_i}, x_{i+1}, \ldots, x_n) \le 
+f(\underbrace{0, 1, \cdots}_{A}, 1, x_{i+1}, \ldots, x_n) \implication Ax_i$ je
+implikant $f \implication \<Cons>(Ax_i, A\overline{x}_i) = A$ je implikant $f$,
+tedy $A\overline{x}_i$ nemohl být primární implikant.
+
+\defn{}
+Funkce $f$ je \df{pozitivní/negativní}, pokud je pozitivní/negativní ve
+v¹ech promìnných. V¹echny funkce, které jsou pozitivní, nebo negativní se
+nazývají \df{monotónní}. Funkce, která je v ka¾dé promìnné pozitivní nebo
+negativní se nazývají \df{unátní}.
+
+\obs Z pozitivní \<DNF> lze v polynomiálním èase vyrobit kanonickou \<DNF>
+(staèí absorbce).
+
+\sec{Regulární funkce}
+
+\defn
+Nech» $f$ je booleovská funkce na $n$ promìnných. Øekneme, ¾e \df{$x_i$ je
+silnìj¹í ne¾ $x_j$ vzhledem k $f$} \foot{BUNO $i<j$}, pokud $\forall
+x_1,\ldots,x_{i-1},x_{i+1},\ldots,x_{j-1},x_{j+1},\ldots,x_n$:
+
+$$
+f(x_1,\ldots,x_{i-1},{\bf 1},\ldots,x_{j-1},{\bf 0},\ldots,x_n)\geq f(x_1,\ldots,x_{i-1},{\bf 0},\ldots,x_{j-1},{\bf 1},\ldots,x_n)
+$$
+
+
+\nota
+Znaèíme následovnì: $x_i \succeq_{f} x_j$. Zavedeme té¾ symboly $\succ_{f}$ a $\sim{f}$:
+$$
+\eqalign{
+x_i \succ_{f} x_j & \iff x_i \succeq_{f} x_j \land \neg ( x_j \succeq_{f} x_i ) \cr
+x_i \sim_{f} x_j  & \iff x_i \succeq_{f} x_j \land x_j \succeq_{f} x_i
+}
+$$
+
+\thm
+Relace $\succeq_{f}$ je pøeduspoøádání na mno¾inì promìnných.
+
+\proof
+Doká¾eme, ¾e relace je reflexivní a tranzitivní.
+\itemize\ibull
+	\: reflexivita: Dodefinujeme relaci $\succeq_{f}$ pro $i=j$.
+	\: tranzitivita: Doká¾eme, ¾e pro libovolné $i,j,k$ (BUNO $i<j<k$) platí:
+$$
+x_i \succeq_{f} x_j \land x_j \succeq_{f} x_k \iff x_i \succeq_{f} x_k
+$$
+
+Z definice relace $\succeq_{f}$ odvodíme:
+	\numlist\nparen
+		\:$f(..\underbrace{1}_{i}..\underbrace{0}_{j}..\underbrace{0}_{k}..)
+\underbrace{\geq}_{x_i \succeq_{f} x_j} f(..\underbrace{0}_{i}..\underbrace{1}_{j}..\underbrace{0}_{k}..)
+\underbrace{\geq}_{x_j \succeq_{f} x_k} f(..\underbrace{0}_{i}..\underbrace{0}_{j}..\underbrace{1}_{k}..)$
+		\:$f(..\underbrace{1}_{i}..\underbrace{1}_{j}..\underbrace{0}_{k}..)
+\underbrace{\geq}_{x_j \succeq_{f} x_k} f(..\underbrace{1}_{i}..\underbrace{0}_{j}..\underbrace{1}_{k}..)
+\underbrace{\geq}_{x_i \succeq_{f} x_j} f(..\underbrace{0}_{i}..\underbrace{1}_{j}..\underbrace{1}_{k}..)$
+	\endlist
+Tedy dohromady
+$\forall x_1,\ldots,x_{i-1},x_{i+1},\ldots,x_{k-1},x_{k+1},\ldots,x_n$:
+$$
+f(..\underbrace{1}_{i}..\underbrace{0}_{k}..)\geq f(..\underbrace{0}_{i}..\underbrace{1}_{k}..)
+$$
+\endlist
+Q.E.D.
+
+\defn
+
+Pozitivní booleovská funkce $f$ je \df{regulární}, pokud uspoøádání podle $\succeq_{f}$
+je úplné uspoøádání.
+
+\bye

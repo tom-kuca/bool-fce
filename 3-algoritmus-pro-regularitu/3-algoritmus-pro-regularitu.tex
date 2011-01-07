@@ -1,0 +1,92 @@
+\input ../macros.tex
+
+\prednaska{3}{Algoritmus pro testování regularity funkcí}{}
+
+Cílem této kaiptoly je popsat algoritmus na rozpoznávání regulárních funkcí.
+V prùbìhu celé kapitoly uva¾ujeme, ¾e na vstupu je pozitivní DNF formule.
+
+\thm\id{bc_thm}
+Nech» $f$ je pozitivní boolovská funkce v $n$ promìnných a $\F$ je kanonická DNF funkce $f$. Zapi¹me $\F$ ve tvaru 
+$$\F = A x_i x_j \lor Bx_i \lor Cx_j \lor D,$$
+kde $x_i, x_j$ jsou lib. promìnné a $A, B, C, D$ jsou DNF na zbylých promìnných. Pak $x_i \succeq x_j$ právì tehdy, kdy¾ $B \ge C$.
+
+\proof
+BÚNO $i=1$, $j=2$. Z definice $\succeq$ dostaneme $x_i \succeq x_j \iff f(1, 0, \ldots) \ge f(0, 1, \ldots) \iff B \lor D \ge C \lor D$.
+Staèí tedy dokázat $B \lor D \ge C \lor D \iff B \ge C$.
+
+    $\invimplication$: platí triviálnì
+
+    $\implication$: staèí ukázat, ¾e ka¾dý implikant $p \in C$ je absorbován nìjakým implikantem z $B$.
+
+$$ p \hbox{ implikant } C \left\{
+\eqalign{
+&\hbox{$px_j$ je implikant $f$, který je primání\hfill} \cr
+&\hbox{$p$ je absorbován implikantem $q$ v $B \lor D$. } \cr
+}
+\right. 
+$$
+$q$ nemù¾e být v $D$, proto¾e pak by $q$ absorbovalo $px_2$, a tedy by $\F$ nebyla kanonická.
+
+
+Jak ovìøit, ¾e $B \ge T$? 
+
+Dosadíme do $B$ jediné ohodnocení promìnných z $T$, pro které $T = 1$ a po
+dosazení ovìøíme falzifikovatelnost DNF $B'$, která vznikne. Pokud $B'$
+falzifikuje, tak $B \not\ge T$, pokud $B = 1$, tak $B \ge T$. 
+
+Nebo také ménì formálnì: ovìøuju-li, ¾e $B \ge C$ a $B$, $C$ jsou pozitivní formule, staèí ovìøit, ¾e
+v¹echny implikanty v $C$ jsou absorbované nìjakým implikantem v $B$. V obecném
+pøípadì je to tì¾ké, pro pozitivní formule staèí nalézt podtermy.
+
+Jak ovìøit, ¾e $B \sim T$? 
+Pro ka¾dé $i$, $j$ otestujeme, zda $x_i \succeq x_j$ a $x_j \succeq x_i$ v èase $\Theta(nm^2)$, kde $n$ je poèet promìnných formule a $m$ poèet termù.
+
+\h{Algoritmus na rozpoznávání regularity}
+
+\numlist\nparen
+\: $\Theta(n^3m^2)$: otestuj v¹echny dvojice promìnných
+\: $\Theta(n^2m^2\log{n})$: pomocí tøídícího algoritmu
+\: $\Theta(n^2m^2)$: 
+
+    Definujeme $W$ matici $n \times n$, kde $W[k, j] = \#$ termù obsahujících
+    $x_k$ délky $j$. Její øádky oznaème $R_i$.
+
+
+\numlist\nalpha
+    \:  $x_i \sim x_j \implication R_i = R_j$ 
+    \:  $x_i \succeq x_j \implication R_i > R_j$  (dle lexikografického uspoøádání)
+\endlist
+
+\proof
+
+\numlist\nalpha
+    \:  $x_i \sim x_j \iff B = C$ (ve smyslu vìty \ref{bc_thm}) $\implication$ nech» $p$ je implikant $C$, díky $\ge \exists q \in B$ absorbující $p$ a obrácenì, tj. $ p = q \implication B$ a $C$ jsou identické DNF
+    \: Chceme $ x_i \succ x_j \implication R_i  > R_j $. Platí $x_i \succ x_j \iff B > C$. Definujme
+    $$
+    \eqalign{
+    &\hbox{$B(d) = \{p \vert \vert p\vert = d \& Tx_i$ je term v $B\}$} \cr
+    &\hbox{$C(d) = \{p \vert \vert p\vert = d \& Tx_j$ je term v $C\}$} 
+    }
+    $$
+
+    Nech» $\delta = \<min>\{d \vert B(d) \not=  C(d)\}$. Takové $\delta$ existuje, nebo» $B > C$. Nech» $p \in C(d)$. Z $B > C$ plyne, ¾e $\exists$ term $T \lor B$ absorbující $\prod_{k \in P} x_k$
+
+    \numlist\nparen
+    \: $\vert Q \vert < \vert P \vert$ nemù¾e nastat, proto¾e pak $T \in C$ (a¾ do $\delta$ jsou $B(d)$ i $C(d)$ toto¾né, a tedy $C$ není kanonická.
+    \:$\vert Q \vert = \vert P \vert$, pak $Q = P$ a $\prod_{k \in P} x_k \in B$
+        $ \implication C(\delta) \subseteq B(\delta)$, zároveò $C(\delta) 
+        \not= B(\delta)$ (z definice $\delta$), tedy $ R_i > R_j$
+    \endlist
+\endlist
+
+Algoritmus nejprve sestrojí matici, poté lexikograficky setøídí její øádky a nakonec pro ka¾dé dva sousední øádky ovìøí, ¾e pro pøíslu¹ná $i$, $j$ platí $x_i \succeq x_j$.
+
+
+Slo¾itost: Inicializace matice probìhne v èase $\O(n^2)$. Hodnoty v matici
+lze spoèítat v $O(nm)$ jedním prùchodem formule $\F$. Setøídìní øádkù matice lze provést pøihrádkovým tøídìním v lineárním èase. 
+
+\endlist
+
+\rem Vhodnou datovou strukturou lze porovnání $x_i \succeq x_j$ provést v $\O(nm)$ a celý algoritmus má pak slo¾itost $\O(n^2m)$.
+
+\bye

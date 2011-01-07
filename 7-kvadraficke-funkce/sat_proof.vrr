@@ -1,0 +1,12 @@
+
+ (document 0.6 ( (filename "/home/tomas/mff/boolovske_funkce_a_jejich_aplikace/7-kvadraficke-funkce/sat_proof_neg.vrr") (name "Untitled 1")) (
+ (page ( (tex_footer "\\bye
+") (tex_header "\\nopagenumbers\\vglue0pt
+") (name "Page 1")) (
+ (segment (coords -40.0 0.0) (coords -10.0 0.0) ( (id 149445376) (stroke-style (stroke-style solid)) (stroke-cap (cap-style butt)) (stroke-join (join-style miter)) (stroke-width 0.150000005960464) (stroke-color (rgb 0 0 0)) (fill-color (rgba 0 0 0 0)) (invisible #f) (name "noname")))
+ (top-level-group ( (name "top-level-group")) (
+ (decorator-point (coords -40.0 0.0) 0 2.0 0.0 ( (stroke-style (stroke-style solid)) (stroke-cap (cap-style butt)) (stroke-join (join-style miter)) (stroke-width 0.150000005960464) (stroke-color (rgb 0 0 0)) (fill-color (rgba 255 253 254 250)) (invisible #f) (name "noname")))
+ (decorator-point (coords -10.0 0.0) 0 2.0 0.0 ( (stroke-style (stroke-style solid)) (stroke-cap (cap-style butt)) (stroke-join (join-style miter)) (stroke-width 0.150000005960464) (stroke-color (rgb 0 0 0)) (fill-color (rgba 255 253 254 250)) (invisible #f) (name "noname")))
+ (tex-text (end 149445376) "${C_2} = 0$" ( (relative-position-x 0.5) (relative-position-y 0.5) (absolute-shift-x 0.0) (absolute-shift-y 4.0) (alignment-x (alignment-x ref-relative)) (alignment-y (alignment-y bbox-relative)) (transform (transform 1.0 0.0 0.0 1.0)) (fill-color (rgb 0 0 0)) (invisible #f) (name "noname")))
+ (tex-text (start 149445376) "${C}_1 = 1$" ( (relative-position-x 0.5) (relative-position-y 0.5) (absolute-shift-x 0.0) (absolute-shift-y 4.0) (alignment-x (alignment-x ref-relative)) (alignment-y (alignment-y bbox-relative)) (transform (transform 1.0 0.0 0.0 1.0)) (fill-color (rgb 0 0 0)) (invisible #f) (name "noname")))
+ (decorator-arrow 149445376 0.930000007152557 2.0 0.0 ( (back-distance 0.600000023841858) (front-curvature 0.400000005960464) (arrow-angle 1.0) (arrow-back (arrow-back poly)) (arrow-front (arrow-front parabolic)) (arrow-alignment (arrow-alignment back)) (reversed #f) (stroke-style (stroke-style solid)) (stroke-cap (cap-style butt)) (stroke-join (join-style miter)) (stroke-width 0.150000005960464) (stroke-color (rgb 0 0 0)) (fill-color (rgba 0 0 0 252)) (invisible #f) (name "noname"))) 149445376))))))

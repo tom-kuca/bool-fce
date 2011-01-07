@@ -1,0 +1,123 @@
+export TEXINPUTS=.:..:
+
+LATEX	= csplain --interaction=nonstopmode -src-specials -file-line-error
+PDFLATEX= pdfcslatex
+BIBTEX	= bibtex
+MAKEINDEX = makeindex
+XDVI	= xdvi -gamma 4
+DVIPS	= dvips
+DVIPDF  = dvipdft
+L2H	= latex2html
+GH	= gv
+
+RERUN = "(There were undefined references|Rerun to get (cross-references|the bars) right)"
+RERUNBIB = "No file.*\.bbl|Citation.*undefined"
+MAKEIDX = "^[^%]*\\makeindex"
+MPRINT = "^[^%]*print"
+USETHUMBS = "^[^%]*thumbpdf"
+
+DATE=$(shell date +%Y-%m-%d)
+
+COPY = if test -r $(<:%.tex=%.toc); then cp $(<:%.tex=%.toc) $(<:%.tex=%.toc.bak); fi 
+RM = rm -f
+OUTDATED = echo "EPS-file is out-of-date!" && false
+
+
+define run-latex
+	$(COPY);$(LATEX) $<
+	echo $(LATEX)
+	egrep $(MAKEIDX) $< && ($(MAKEINDEX) $(<:%.tex=%);$(COPY);$(LATEX) $<) >/dev/null; true
+	egrep -c $(RERUNBIB) $(<:%.tex=%.log) && ($(BIBTEX) $(<:%.tex=%);$(COPY);$(LATEX) $<) ; true
+	egrep $(RERUN) $(<:%.tex=%.log) && ($(COPY);$(LATEX) $<) >/dev/null; true
+	egrep $(RERUN) $(<:%.tex=%.log) && ($(COPY);$(LATEX) $<) >/dev/null; true
+	if cmp -s $(<:%.tex=%.toc) $(<:%.tex=%.toc.bak); then true ;else $(LATEX) $< ; fi
+	$(RM) $(<:%.tex=%.toc.bak)
+	# Display relevant warnings
+	egrep -i "(Reference|Citation).*undefined" $(<:%.tex=%.log) ; true
+endef
+
+define run-pdflatex
+	LATEX=$(PDFLATEX)
+	@$(run-latex)
+endef
+
+define get_dependencies
+	deps=`perl -ne '($$_)=/^[^%]*\\\(?:include|input)\{(.*?)\}/;@_=split /,/;foreach $$t (@_) {print "$$t.tex "}' $<`
+endef
+
+define getbibs
+	bibs=`perl -ne '($$_)=/^[^%]*\\\bibliography\{(.*?)\}/;@_=split /,/;foreach $$b (@_) {print "$$b.bib "}' $< $$deps`
+endef
+
+define geteps
+	epses=`perl -ne '@foo=/^[^%]*\\\(includegraphics|psfig)(\[.*?\])?\{(.*?)\}/g;if (defined($$foo[2])) { if ($$foo[2] =~ /.eps$$/) { print "$$foo[2] "; } else { print "$$foo[2].eps "; }}' $< $$deps`
+endef
+
+define manconf
+	mandeps=`if test -r $(basename $@).cnf ; then cat $(basename $@).cnf |tr -d '\n\r' ; fi`
+endef
+
+SRC	:= $P.tex
+TRG	= $(SRC:%.tex=%.dvi)
+PSF	= $(SRC:%.tex=%.ps)
+PDF	= $(SRC:%.tex=%.pdf)
+
+
+all 	: $(PSF)
+
+#%.pdf: %.tex  ../macros.tex ../bf.bib
+#	pdfcsplain $<
+
+%.ps: %.dvi
+	dvips -D600 -o $@ -O-15.4mm,-15.4mm -t a5 $<
+
+# This is a rule to generate a file of prerequisites for a given .tex file
+%.d	: %.tex
+	$(get_dependencies) ; echo $$deps ; \
+	$(getbibs) ; echo $$bibs ; \
+	$(geteps) ; echo $$epses ; \
+	$(manconf) ; echo  $$mandeps  ;\
+	echo "$*.dvi $@ : $< $$deps $$bibs $$epses $$mandeps" > $@ 
+
+$(DEP) 	: $(BIBFILE)
+$(TRG)	: %.dvi : %.tex $(EPSPICS)  ../macros.tex
+	  @$(run-latex)
+
+$(PSF)	: %.ps : %.dvi
+	  @$(DVIPS) $< -o $@
+
+$(PDF)  : %.pdf : %.dvi
+	  @$(DVIPDF) -o $@ $<
+
+show	: $(TRG)
+	  @for i in $(TRG) ; do $(XDVI) $$i & done
+
+showps	: $(PSF)
+	  @for i in $(PSF) ; do $(GH) $$i & done
+
+dvi	: $(TRG) 
+
+ps	: $(PSF) 
+
+pdf	: $(PDF) 
+
+#%-booklet.ps: %.ps
+#	psbook <$< | pstops '2:0L(210mm,0)+1L(210mm,148mm)' | sed 's/^%%BoundingBox: .*/%%BoundingBox: 0 0 595 842/;s/^%%DocumentPaperSizes:.*/%%DocumentPaperSizes: a4\n%%Orientation: Landscape/' >$@
+
+#%-2in1.ps: %.ps
+#	pstops '2:0L(210mm,0mm)+1L(210mm,148mm)' <$< | sed 's/^%%BoundingBox: .*/%%BoundingBox: 0 0 595 842/;s/^%%DocumentPaperSizes:.*/%%DocumentPaperSizes: a4\n%%Orientation: Landscape/' >$@
+
+%-2in1.pdf: %.pdf
+	pspdftool 'nup(2, paper=a4)' $< $@
+
+%-booklet.pdf: %.pdf
+	pspdftool 'book nup(2, paper=a4)' $< $@
+
+
+clean	:
+	  -rm -f $(TRG) $(PSF) $(PDF) $(TRG:%.dvi=%.aux) $(TRG:%.dvi=%.bbl) $(TRG:%.dvi=%.blg) $(TRG:%.dvi=%.log) $(TRG:%.dvi=%.out) $(TRG:%.dvi=%.idx) $(TRG:%.dvi=%.ilg) $(TRG:%.dvi=%.ind) $(TRG:%.dvi=%.toc) $(TRG:%.dvi=%.d) $(TRG:%.dvi=%.ids)
+
+veryclean	: clean
+	  -rm -f *.log *.aux *.dvi *.bbl *.blg *.ilg *.toc *.lof *.lot *.idx *.ind *.ps  *~
+
+.SECONDARY:

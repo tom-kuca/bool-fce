@@ -1,0 +1,282 @@
+\input ucwmac.tex
+\input ucw-ofs.tex
+\input ucw-verb.tex
+\input fonts12.tex
+\input epsf.tex
+
+\def\em#1{{\it #1\/}}
+\def\df#1{{\it #1\/}}	% when we define something
+\def\O{{\cal O}}
+\def\F{{\cal F}}
+\let\>=\noindent
+\def\TODO#1{\>{\bf TODO:} #1}
+\def\FIXME#1{\>{\bf TODO:} #1}
+\def\qed{{\parfillskip=0pt\allowbreak\hfill\nobreak $\spadesuit$\par}}
+\def\qeditem{{\parfillskip=0pt\hfill\rlap{\hskip\rightskip\llap{$\spadesuit$}}\par}}
+\def\qedmath{\eqno{\spadesuit}}
+\def\symdiff{\mathbin{\Delta}}
+\def\rack#1#2{\setbox0=\hbox{#1}\hbox to \wd0{#2}}
+\def\o#1{\accent23 #1}
+\def\mst{\mathop{\rm mst}}
+\def\msf{\mathop{\rm msf}}
+\def\deg{\mathop{\rm deg}}
+\def\timesalpha{\mskip2mu\alpha}
+\def\timesbeta{\mskip2mu\beta}
+\def\tower{\mathbin\uparrow}
+\def\Forb{{\rm Forb}}
+\def\minorof{\preccurlyeq}
+\def\per{\mathop{\rm per}}
+\def\poly{\mathop{\rm poly}}
+\def\E{{\bb E}}
+\def\N{{\bb N}}
+\def\Z{{\bb Z}}
+\def\crpt{\mathbin{\Uparrow}}
+\def\C{{\cal C}}
+\def\sgc{\mathbin{.}}
+\def\veclength#1{\vert \vec{#1} \vert}
+\def\distance#1#2{\veclength{#1 #2}}
+\def\O{{\cal O}}                % Asymptoticke O-cko
+\def\assign{\leftarrow} 
+
+\def\implication{\Rightarrow}
+
+\def\invimplication{\Leftarrow}
+
+% Zacatek prednasky {cislo prednasky}{jmeno prednasky}{jmeno zapisovatele}
+\def\prednaska#1#2#3{%
+\prechapter{#1}{#2}
+\vbox{%
+\line{{\Large\bf #1. #2} \hfil {\it #3}}
+\vskip 4pt
+\hrule}
+\medskip
+}
+\def\prechapter#1#2{}
+
+% Nadpis {text}
+\def\h#1{\medbreak\leftline{\bf #1}\nobreak\smallskip\nobreak}
+
+% Zvyrazneny zacatek odstavce coby podnadpis (napr. vety apod.)
+\def\s#1{\noindent {\bo #1}}
+
+% A kdyz stoji samostatne (aby se naodlamoval)
+\def\ss#1{\noindent {\bo #1}\par\nobreak}
+
+% Poznamky pod carou
+\newcount\footcnt
+\footcnt=0
+\def\foot#1{\global\advance\footcnt by 1{\parindent=0.25in\parskip=0pt\footnote{$^{\left<\the\footcnt\right>}$}{#1}}}
+
+% \noindent se casto hodi, tak na nej mame zkratku
+\let\>=\noindent
+
+% Vlozeni obrazku {obrazek}{popisek}{sirka}
+\def\figure#1#2#3{\bigskip\vbox{\centerline{\epsfxsize=#3\epsfbox{#1}}\smallskip\centerline{#2}}\bigskip}
+
+% Varianta bez popisku
+\def\fig#1#2{\medskip\centerline{\epsfxsize=#2\epsfbox{#1}}\medskip}
+
+% Dva obrazky vedle sebe s popiskami
+\def\twofigures#1#2#3#4#5#6{\bigskip\centerline{\vbox{\halign{\hfil##\hfil\hskip 4em&\hfil##\hfil\cr
+\epsfxsize=#3\epsfbox{#1}&\epsfxsize=#6\epsfbox{#4}\cr
+\noalign{\smallskip}
+#2&#5\cr}}}\bigskip}
+
+% Obrazek vlozeny do praveho okraje odstavce {obrazek}{sirka}
+% Pouzit na zacatku odstavce a nejlepe celou konstrukci zavrit do vboxu, aby se nerozlomila
+\def\inlinefig#1#2{
+\setbox0=\hbox{\epsfxsize=#2\epsfbox{#1}}
+\hangindent=-\wd0
+\advance\hangindent by -3em
+\dimen0=\ht0
+\advance\dimen0 by 8ex
+\advance\dimen0 by \normalbaselineskip
+\count0=\dimen0
+\divide\count0 by \normalbaselineskip
+\hangafter=-\count0
+\dimen0=\normalbaselineskip
+\multiply\dimen0 by \count0
+\vbox to 0pt{}
+\nointerlineskip
+\vbox to 0pt{\vbox to \dimen0{\vss\rightline{\box0\hskip 1em}\vss}\vss}
+\nointerlineskip
+}
+
+% Todo
+\def\todo#1{{\bf TODO: \it #1}}
+
+
+% Moving the tilda to the correct height for a url
+\def\urltilda{\kern -.15em\lower .7ex\hbox{\~{}}\kern .04em}
+\def\urldot{\kern -.10em.\kern -.10em}
+\def\urlhttp{http\kern -.10em\lower -.1ex\hbox{:}\kern -.12em\lower 0ex\hbox{/}\kern -.18em\lower 0ex\hbox{/}}
+
+\def\brk{\hfil\break}
+
+
+
+
+% Bit strings
+\def\0{{\bf 0}}
+\def\1{{\bf 1}}
+\def\(#1){\mathord{\left<#1\right>}}
+
+% Bitwise operations
+\def\shl{\mathbin{<\!<}}
+\def\shr{\mathbin{>\!>}}
+\def\bop#1{\mathbin{\hbox{\sc #1}}}
+\def\band{\bop{and}}
+\def\bor{\bop{or}}
+\def\bxor{\bop{xor}}
+\def\bnot{\mathop{\hbox{\sc not}}}
+
+% Footnotes
+\newcount\footcnt
+\footcnt=0
+\def\foot#1{\global\advance\footcnt by 1{\parindent=0.25in\parskip=0pt\footnote{$^{\bf\the\footcnt}$}{#1}}}
+
+%%% Chapters, sections and proclamations %%%
+
+\newcount\chapcount
+\newcount\seccount
+\newcount\thmcount
+\newcount\tmpcount
+\newcount\figcount
+\chapcount=0
+\seccount=0
+\thmcount=0
+\figcount=0
+\def\currentid{??}
+\def\currentchap{??}
+
+\def\appendices{\chapcount=99}
+
+\def\link#1{\mdwsmall\tt #1}
+
+\def\para{\smallskip\noindent}
+
+\def\fignext{\advance\figcount by 1
+\edef\currentid{\currentchap.\the\seccount.\the\figcount}
+}
+
+
+
+\def\proclaim#1{\para {\bf #1.\enspace}}
+\def\fignum#1{\fignext\noindent {Obr\'{a}zek \currentid.\enspace} {#1.\enspace}}
+
+\def\thm{\proclaim{V\v{e}ta}}
+\def\lemma{\proclaim{Lemma}}
+\def\claim{\proclaim{Tvrzen\'\i{}}}
+\def\defn{\proclaim{Definice}}
+\def\problem{\proclaim{Probl\'em}}
+\def\obs{\proclaim{Pozorov\'an\'\i{}}}
+\def\rem{\proclaim{Pozn\'amka}}
+\def\alg{\proclaim{Algoritmus}}
+\def\impl{\proclaim{Implementace}}
+\def\cor{\proclaim{D\o{u}sledek}}
+\def\nota{\proclaim{Zna\v{c}en\'\i{}}}
+\def\example{\proclaim{P\v{r}\'\i{}klad}}
+
+\def\paran#1{\para {\sl #1.\/}\enspace\eatspaces}
+
+\def\proof{\noindent {\sl D\o{u}kaz.}\enspace}
+\def\proofsketch{\noindent {\sl Idea d\o{u}kazu.}\enspace}
+
+
+\def\label#1{{\sl (#1)\/}\enspace}
+\def\labelx#1{\label{#1}\hfil\break\eatspaces}
+\def\eatspaces{\kern0pt}
+
+\def\thmn{\thm\labelx}
+\def\lemman{\lemma\labelx}
+\def\defnn{\defn\labelx}
+\def\corn{\cor\labelx}
+\def\algn{\alg\label}
+\def\notan{\nota\labelx}
+\def\examplen{\example\labelx}
+\def\problemn{\problem\labelx}
+\def\remn{\rem\labelx}
+
+%%% Algorithms %%%
+
+%	\algo{jmeno algoritmu}
+%	\algin popis vstupu
+%	\:krok
+%	\:krok
+%	\::vnoreny krok
+%	\algout popis vystupu
+%	\endalgo
+%
+\def\interlistskip{\vskip 3pt plus 2pt minus 1pt}
+
+
+% Nadpis {text}
+\def\sec#1{\bigskip\leftline{\large\bf #1. }\nobreak\bigskip\nobreak}
+
+\def\paran#1{\para {\sl #1.\/}\enspace\eatspaces}
+
+\def\algo{
+\interlistskip
+\begingroup
+\let\:=\algoitem
+\parskip=1pt plus 1pt minus 0.3pt
+\rightskip=2em
+\itemcount=0
+\smallskip
+\algn
+}
+\def\endalgo{\interlistskip\endgroup}
+\def\algopar{\par
+\parindent=2em
+\hangindent=4em
+\hangafter=1
+\leavevmode
+}
+\def\algoitem{
+\algopar\advance\itemcount by 1
+\hbox to 2em{\hss \the\itemcount. }%
+\futurelet\next\algoitemh}
+\def\algoitemh{\ifx\next:\let\next=\algohang\else\let\next=\relax\fi\next}
+\def\algohang:{\advance\hangindent by 2em \hskip 2em\futurelet\next\algoitemh}
+\def\algin{\par{\sl Vstup:\/} }
+\def\algout{\par{\sl V\'ystup:\/} }
+
+%%% Constructs used in algorithms %%%
+
+\def\={\leftarrow}
+\def\cmt#1{~~{\sl (#1)}}
+
+%%% Enumerated lists %%%
+
+\def\eqalign#1{\null\,\vcenter{\openup\jot
+  \ialign{\strut\hfil$\displaystyle{##}$&$\displaystyle{{}##}$\hfil
+      \crcr#1\crcr}}\,}
+
+%%% References %%%
+
+\newwrite\ids
+\def\writeid#1#2{\immediate\write\ids{\string\def\expandafter\string\csname id#1\endcsname{#2}}}
+
+\immediate\openin\ids=\jobname.ids
+\ifeof\ids
+\else
+\input \jobname.ids
+\fi
+\immediate\closein\ids
+\immediate\openout\ids=\jobname.ids
+
+\def\ref#1{\expandafter\ifx\csname id#1\endcsname\relax
+{\bf ??}%
+\immediate\write16{*** Warning: Reference #1 undefined ***}%
+\else
+\csname id#1\endcsname
+\fi
+}
+
+\def\id#1{\writeid{#1}{\currentid}}
+
+\def\strutA#1#2{\vrule height#1 depth#2 width0pt}
+
+% Ujisti se, ze na strance je dostatek mista, pripadne zacne novou stranku
+\def\checkroom#1{\vskip 0pt plus #1\goodbreak\vskip 0pt plus -#1}
+

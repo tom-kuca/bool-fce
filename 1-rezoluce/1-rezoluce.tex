@@ -1,0 +1,200 @@
+\input ../macros.tex
+
+\prednaska{1}{Úvod do Boolovských funkcí}{}
+
+V~této kapitole nadefinujeme literály, logické operátory, Boolovské formule
+a funkce. Popí¹eme normální tvary formulí (\<DNF>, \<CNF>) a jejich vlastnosti. Dále
+zavedem implikanty, konsekventy, rezoluci (konsensus). V závìru popí¹eme
+rezoluèní metodu a doká¾eme její úplnost.
+item    
+
+\h{Boolovské funkce}
+
+\itemize\idot
+\: $x, y, z$ jsou \df{boolovské funkce}
+\: $v(x) \in \{0,1\}$ je \df{ohodnocovací funkce}
+\: $\neg{x}, \overline{x}$ je \df{negace $x$}
+\: promìnné a promìnné s negací jsou \df{literály}
+\:  $\lor, \land$ ($\implication, \iff$) jsou binární operátory
+\endlist
+
+\defnn{Boolovská formule}
+Boolovskou formuli definujme rekurzivnì:
+\itemize\idot   
+    \: ka¾dý literál je \df{Boolovská formule} (dále jen \df{formule})
+    \: pokud jsou $A, B$ formule, pak $\neg{A}, \neg{B}, A \lor B, A \land B, A \implication B, A \iff B$ jsou také formule
+\endlist
+
+\defnn{Normální formy}
+Disjunkci literálù nazýváme \df{klauzule}, konjunkci literálù nazýváme
+\df{term}. Formule je v \df{konjunktivní normální formì} (\<CNF>), pokud je
+konjunkcí klauzulí. Formule je v disjunktivní normální formì (\<DNF>), pokud je disjunkcí termù.
+
+\defnn{Ekvivalentní formule}
+Následující pravidla definují ekvivalentní formule, lze je vyu¾ít k úpravì formulí:
+\numlist\ndotted
+    \: $\neg{(A \lor B)} \equiv \neg{A} \land \neg{B}$ (de Morganovo pravidlo)
+    \: $\neg{(A \land B)} \equiv \neg{A} \lor \neg{B}$ (de Morganovo pravidlo)
+    \: $A \lor (B \land C) \equiv (A \lor B) \land (A \lor C)$ (distributivita $\lor$)
+    \: $A \land (B \lor C) \equiv (A \land B) \lor (A \land C)$ (distributivita $\land$)
+\endlist
+
+\defn \df{Boolovská funkce} je funkce $f: \{0, 1\}^n \rightarrow \{0, 1\}$. Lze ji reprezentovat napø. formulí nebo tabulkou.
+
+$$\vbox{
+\offinterlineskip
+\halign{
+\strut  \hfill\quad#\hfill & \hfill\quad#\hfill & \hfill\quad#\hfill & \vrule\hfill\quad#\hfill \cr
+$x_1$ & $x_2$ & $x_3$ & $f(x_1, x_2, x_3)$ \cr
+\noalign{\hrule}
+0 &0 &1 &0 \cr
+0 &1 &0 &1 \cr
+0 &1 &1 &0 \cr
+1 &0 &0 &1 \cr
+1 &0 &1 &1 \cr
+1 &1 &0 &0 \cr
+1 &1 &1 &1 \cr
+}}$$
+
+Vektory, pro které $f = 1$, nazýváme \df{true-pointy}, ostatní, pro které $f=0$ oznaèujeme jako \df{false-pointy}.
+
+
+Nebo na \<DNF> (disjunkce termù odpovídajících true-pointum):
+
+\obs
+Ke ka¾dé formuli existuje logicky ekvivalentní formule v \<CNF> i \<DNF>.
+
+\proof
+Pokud funkce reprezentujeme tabulkou, pak mù¾eme sestavit normální formy:
+\itemize\ibull
+    \: \<DNF>: disjunkce termù ``odpovídajících'' true-pointùm dané funkce
+        $$
+        f(x_1, x_2, x_3) = (\neg x_1 \wedge x_2 \wedge \neg x_3)\vee(x_1 \wedge \neg x_2 \wedge \neg x_3)\vee(x_1 \wedge \neg x_2 \wedge x_3)\vee(x_1 \wedge x_2 \wedge x_3)
+        $$
+    \: \<CNF>: konjunkce klauzulí ``odpovídajících'' false-pointùm dané funkce
+        $$
+        f(x_1, x_2, x_3) = (\neg x_1 \vee \neg x_2 \vee \neg x_3 )\wedge(\neg x_1 \vee \neg x_2 \vee x_3 )\wedge(\neg x_1 \vee x_2 \vee x_3 )\wedge(x_1 \vee x_2 \vee \neg x_3 )
+        $$
+\endlist
+
+\obs
+Poèet boolovských funkcí na $n$ promìnných je $2^{2^n}$ (tabulka má $2^n$ øádkù, na ka¾dém mù¾e být hodnota $f$ 1 nebo 0).
+
+\defnn{Uspoøádání boolovských funkcí}
+Definujme relaci $>$ takto: $f > g$ právì tehdy, kdy¾ $\forall x$:~$f(x)
+> g(x)$. Odbobnì $\ge, \le, <$.
+
+\medskip
+
+V následující èásti se zamìøíme na \<DNF>. Vìci, které doká¾eme, platí analogicky i pro \<CNF>.
+
+\medskip
+
+\defn
+Term $T$ je \df{implikantem} funkce $f$, pokud $T = 1 \implication f = 1$ (korektnì $\forall x T(x) = 1 \implication f(x) = 1$). Term $T$ je \df{primární implikant}, pokud po vypu¹tìní libovolného literálu pøestane být implikantem.
+
+\example
+$\underbrace{x_1\overline{x_2}}_{primární} \lor 
+ \underbrace{x_1x_3\overline{x_4}}_{neprimární} \lor 
+ \underbrace{x_2\overline{x_4}}_{primární} \lor 
+ \underbrace{x_2\overline{x_3}}_{primární}$
+
+Druhý term není primární implikant, nebo» $x_1\overline{x_4}$ je té¾ implikant.
+
+\claim 
+Pokud \<DNF> $\F$ reprezentuje funkci $f$ a $T$ je implikant $f$, pak $\F \lor T$ také reprezentuje $f$.
+
+\proof
+\itemize\ibull
+    \: $\F \le \F \lor T$   triviálnì 
+    \: $\F \ge \F \lor T$   z definice implikantu
+\endlist
+
+\defn Pokud $T_1, T_2$ jsou termy a $T_1 \le T_2$ (tj. $T_2$ je krat¹í, $T_2 \le T_1$ v mno¾inovém smyslu), øíkáme, ¾e $T_2$ \df{absorbuje} $T_1$.
+
+\obs Pokud $\F \lor T_1 \lor T_2$ reprezentuje $f$ a $T_1 \le T_2$, pak $\F \lor T_2$ reprezentuje tuté¾ funkci.
+
+\defn
+Termy $T_1$ a $T_2$ mají \df{konflikt} v promìnné $x$, pokud $x \in T_1$
+a $\neg{x} \in T_2$ (nebo $\neg{x} \in T_1$ a $x \in T_2$) a øekneme, ¾e $T_1$
+a $T_2$ mají \df{konsenus}, pokud mají konflikt v právì jedné promìnné.
+Oznaèíme-li termy $T_1 = A \land x$ resp. $T_2 = B \land \neg{x}$, pak
+$\<Cons>(A,B) = A \land B$.
+
+$$ \left.
+\eqalign{
+T_1  =  A  \land x \cr
+T_2  =  B  \land \bar{x} \cr}
+\right\} Cons(T_1,T_2) = A \lor B
+$$
+
+
+\claim
+Nech» $T_1, T_2$ jsou implikanty $f$ mající konsenzus. Pak $T_3 = \<Cons>(T_1, T_2)$ je také implikantem.
+
+\proof 
+\itemize\ibull
+    \: $T_1 \le f, T_2 \le f$
+    \: $T_1 = A \land x$
+    \: $T_2 = B \land \overline{x}$
+    \: $T_3 = A \land B$
+\endlist
+
+$T_3 = 1 \Rightarrow (A = 1) \land (B = 1) \Rightarrow (T_1 = 1) \lor (T_2 = 1) \Rightarrow f = 1$
+
+\defn \df{Kanonická \<DNF>} funkce $f$ je disjunkce v¹ech primárních implikantù funkce~$f$.
+\algo{Konsenzuální metoda}
+\algin{\<DNF> reprezentující $f$}
+\: Dokud se $\F$ mù¾e zmìnit: 
+\::proveï v¹echny absorbce, které je mo¾né provést
+\::najdi dva termy $T_1, T_2$, ¾e $\<Cons>(T_1, T_2)$ není absorbován ¾ádným termem v $\F$ a pøidej $\<Cons>(T_1, T_2)$ k $\F$
+\algout kanonická \<DNF> reprezentující $f$
+\endalgo
+\checkroom{2pt}
+\thmn{Úplnost konsenzuální metody}
+\numlist\nparen
+    \: Koneènost: ¾ádný term není pøidán dvakrát (díky transitivitì absorbce)
+    \: Koreknost: nech» $\F = R_1 \lor R_2 \lor \ldots \lor R_m$ je výstupem algoritmu a nech» $P$ je primární implikant $f$, který není obsa¾en v $\{R_1, \ldots, R_m\}$.
+        Oznaème ${\cal P} = \{T \vert T \ge P \& \forall l: T $ má konflikt s $R_l\}$. 
+
+        \FIXME ovìøit definici ${\cal P}$
+
+        Mno¾ina ${\cal P}$ je neprázdná, obsahuje alespoò samotné $P$.
+
+        Nech» $P^*$ je nejdel¹í (dle poètu literálù) term v ${\cal P}$.
+
+        \numlist\nromanp
+            \: $\|P^*\| = \|\F\|$,
+
+                pak $P^*$ má konflikt s ka¾dým $R_l$. 
+                Platí $P^* = 1 \implication \forall l: R_l = 0 \implication f = 0$, ale také
+                $P^* = 1 \implication P = 1 \implication f = 1$, co¾ je spor.
+                
+            \: $\|P^*\| < \|\F\|$, 
+                
+                pak $\exists x$ promìnná neobsa¾ená v $P^*$ 
+
+                $P^*x \notin {\cal P} \implication \exists i$, ¾e $P^*x \le R_i \implication R_i$ obsahuje $x$ a èást $P^*$
+                $P^*\overline{x} \notin {\cal P} \implication \exists j$, ¾e $P^*\overline{x} \le R_j \implication R_j$ obsahuje $\overline{x}$ a èást $P^*$, 
+                co¾ ale znamená, ¾e $\<Cons>(R_i, R_j)$ je obsazen v $P^* (\<Cons>(R_i, R_j) \ge P^*)$, tj. $\not\exists R_l$ absorbující $\<Cons>(R_i, R_j)$, co¾ je spor s fungováním algoritmu.
+
+                
+        \endlist
+
+
+\endlist
+
+\paran{Slo¾itost konsenzualní metody}
+
+Oba kroky, mìnící $\F$ v algoritmu konsenzualní metody lze provést v polynomiálním èase.
+Cyklus se ov¹em mù¾e mít exponenciální poèet iteraci. Ve speciálních pøípadech (napr. pokud je omezena délka klauzule, jako tøeba pro 2-SAT, lze dosáhnout lep¹ích výsledkù).
+
+\example
+$$
+\F = x_1 x_2 \ldots x_n \vee \bar{x_1} y_1 \vee \bar{x_2} y_2 \vee \ldots \vee \bar{x_n} y_n
+$$
+Kanonická formule k $\F$ je exponenciálnì dlouhá vzhledem k délce vstupní
+formule.
+
+\bye
+

@@ -1,0 +1,122 @@
+\input ../macros.tex
+
+\prednaska{8}{Rozpoznávání hornovských formulí, miminalizace}{}
+
+\defnn{Kvadartická \<DNF>}
+K \<DNF> $\F$   definujme \df{kvadratickou \<DNF> $\F_q$} následovnì:
+$$
+\{ uv \in \F_q \vert \exists \hbox{ term $T$ v $\F$, ¾e $u, v$ jsou literály v $T$} \}
+$$
+
+\lemma
+$\F$ je hornovská $\iff$ $\F_q$ je falzifikována vektorem $(0, \dots, 0)$
+
+\proof 
+
+\itemize\ibull
+\: ``$\implication$'': $\F$ hornovská $\implication$ $\F_q$ hornovská
+$\implication$ $\F_q$ obsahuje max. 1 negativní literál v termu $\implication$
+$\F_q$ obsahuje alespoò 1 pozitivní literál v termu (je ryze kvadratická)
+$\implication$ $(0, \ldots, 0)$ ji falzifikuje.
+\: ``$\invimplication$'': $(0, \ldots, 0)$ falzifikuje $\F_q$ $\implication$
+$\not\exists$ term v $\F_q$ obsahující dva negativní literály $\implication$ $\F$ je hornovská
+\endlist
+
+\lemma\id{hornsub}
+ $F$ je skrytì hornovská $\iff$ $\F_q$ je falzifikovatelná. Navíc pokud $t$ je pravd. ohodnocení falzifikující $\F_q$, tak substituce
+
+$$
+\eqalign{
+ & x \rightarrow \overline{x} \hbox{ pokud $t(x) = 0$} \cr
+ & x \rightarrow x \hbox{ pokud $t(x) = 1$} 
+}
+$$
+transformuje $\F$ na její hornovskou verzi $\F'$.
+
+\proof 
+
+\itemize\ibull
+    \: ``$\implication$'': $\F$ skrytì hornovská $\implication$ $\exists $ mno¾ina promìnných $S: \F'$
+vzniklá z $\F$ komplementací promìnných v $S$ je hornovská $\implication$ $(0,
+\ldots, 0)$ falzifikuje $\F_q'$ $\implication$  $\F_q$ je falzifikována
+vektorem vzniklým z $(0, \ldots, 0)$ nahrazením nul jednièkami na pozicích
+odpovídajících promìnným v $S$.
+\: ``$\invimplication$'': $\F_q$ falzifikovatelná, má falzifikující ohodnocení $t$
+$\implication$ $\F_q'$ vzniklá z $\F_q$ komplementací promìnnýých, pro které
+$t(x) = 1$ je falzifikována $(0, \ldots, 0)$ $\implication$ $\F_q'$ je
+hornovská $\implication$ $\F$ je skrytì hornovská.
+\endlist
+
+
+Lemma nám dává pøímoèarý $\O(nl)$ algoritmus, proto¾e $|\F_q| \in \O(nl)$, kde $|F| = l$, $n$ je poèet promìnných $\F$ a $l$ poèet jejich literálù.
+
+\cor 
+Nech» $\F$ je kvadratická \<DNF>. Pak $\F$ je falzifikovatelná
+$\implication$ $\F$ je skryté hornovská. Pro ryze kvadratické platí ekvivalence
+(pak dokonce $\F = \F_q$). Abychom dostali $\O(n)$ algoritmus, nahradíme \<DNF>
+$\F$ za \<DNF> $\F'$ takto: 
+
+$$
+\forall u_1, \ldots, u_k \hbox{ term v } \F \rightarrow u_1y_1 \lor y_1u_2y_2 \lor \overline{y}_2u_3y_4 \lor \ldots \lor \overline{y}_{k-2}u_{k-1}y_{k-1} \lor \overline{y}_{k-1}u_k 
+$$ 
+tedy 
+$$
+\F_p = \F_q' = \bigvee_{c \in \F, |C| \ge 2} C_p
+$$
+kde 
+$$
+C_p = u_1y_1^C \lor  \bigvee_{1 \le i \le k} (\overline{y}_{i-1}^Cu_i \lor {y}_{i-1}^Cy_i^C \lor u_iy_i^C) \lor \overline{y}_{k-1}^Cu_k
+$$
+
+Chceme ukázat: $\F_q$ je falzifikovatelná $\iff$ $\F_p$ je falzifikovatelná,
+pøièem¾ $\vert C_p \vert = 3k-2$.
+
+\lemma 
+Nech» $t$ je falzifikující ohodnocení $\F_p$. Pak $t_{|x_1, \ldots, x_n}$ je falzifikující ohodnocení $\F_q$.
+
+\proof
+
+Nech» $u_iu_j$ je libovolný term v $\F_q$ $\implication$ $\exists$ term $c$
+v $\F$, ¾e $C = u_1\ldots u_i\ldots u_j\ldots u_k$ $\implication$ $u_iy_i$,
+$y_i\overline{y}_{i+1}$, $\overline{y}_{i+1}y_{i+2}$,
+$\overline{y}_{i+1}y_{i+2}$, $\ldots$, $\overline{y}_{j-2}y_{j-1}$,
+$\overline{y}_{j-1}y_{j} \in \F_p$. V ohodnocení $t$ jsou v¹echny tyto termy
+falizikovány $\implication$ alespoò jeden z $u_i$, $u_j$ je falzifikován také. 
+
+\cor 
+$f$ falzifikovatelná $\iff$ $\F_q$ falzifikovatelná.
+
+\lemma
+$\F_q$ falzifikovatelná $\implication$ $\F_p$ falzifikovatelná.
+
+\proof 
+
+Nech» $t$ falzifikuje $\F_q$ a nech» $ c = u_1 \ldots u_k$ je term v $\F$. $c_q = \bigvee(u_iu_j)$, tj. $\F_q = 0 \implication C_q = 0 \implication$ nejvý¹e jeden z $u_i$, $1 \le i \le k$ má hodnotu 1. Nech» je to $u_l$.
+Dodefinujeme-li $t(y_i) = 1$, $1 \le i \le l$ $\implication$ $C_p = 0$ na dodefinovaném $t$.
+
+\cor \<DNF> $\F$ je skrytì hornovská $\iff$ $\F_p$ je falzifikovatelná. Navíc  pokud $t$ je falzifikující ohodnocení $\F_p$, tak substituce z \ref{hornsub} transforumje $\F$ na hornovskou \<DNF> $\F'$. 
+
+\algo{Rozpoznávací algoritmus pro skrytì hornovské \<DNF>}
+\algin{formule $\F$}
+\: z $\F$ zkonstruuj $\F_p$
+': Pokud je $\F_p$ prázdná í$\F$ obsahuje jen lineární termy), pak $\F$ je hornovská.
+\: Pomocí 2-SATu na $\F_p$ rozhodni falzifikovatelnost $\F_p$: 
+\:: NE: $\F$ není skrytì hornovská 
+\:: ANO: $\F$ je skrytì hornovská a falzifikující ohodnocení definuje transformaci $\F$ na hornovskou $\F'$    
+\algout{rozhodnutí, zda $\F$ je skrytì hornovská} 
+
+\vskip 0.5cm
+
+\sec{Minimalizace formy boolovských funckí}
+
+DNF $\F$ a èíslo $k \in M$
+
+Otázka: $\exists \<DNF> \F'$ taková, ¾e $\F$ a $\F'$ reprezentují stejnou bool. funkci a $\vert \F' \vert \le k$ (nìkolik verzí podle definice $\vert \F' \vert$, napø. poèet literálù, poèet termù, \dots). 
+
+Obecnì NP-tì¾ké - pro $k = 1$ se tím dá ovìøovat falzifikovatelnost. Uká¾eme, ¾e NP-tì¾ké i pro hornovské \<DNF>, polynomiální pro kvadratické \<DNF>.
+
+\lemma
+Nech» je dána hornovská \<DNF> $\F$ obsahující $l$ literálù. Potom lze v èase $\O(l^2)$ nalézt primární a ireduntantní \<DNF> $\F'$ reprezentující stejnou funkci jako $\F$.
+
+
+\bye

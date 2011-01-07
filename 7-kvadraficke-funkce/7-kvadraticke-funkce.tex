@@ -1,0 +1,107 @@
+\input ../macros.tex
+
+\prednaska{7}{Falzifikovatelnost kvadratických funkcí}{}
+
+Nech» $\F$ na promìnných $x_1, \ldots, x_n$ je ryze kvadratická DNF-formule. Definujme orientovaný graf $G = (V, E)$: 
+$$
+\eqalign{
+    V & = \{x_1, \ldots, x_n, \overline{x_1}, \ldots, \overline{x_2}\}, \cr
+    E & = \{ (u, \overline{v}), (\overline{u}, v) \vert  \forall \hbox{ term }  uv\} 
+}
+$$
+
+\example
+
+$$
+\F = ab \lor b\overline{c} \lor \overline{b}\overline{c} \lor db \lor ad
+$$
+
+\fig{sat.eps}{\epsfxsize}
+
+\thm
+
+Ohodnocení $o: V \rightarrow \lbrace 0,1 \rbrace$
+odpovídá falsifikujícímu ohodnocení $\cal{F}$ právì tehdy, kdy¾:
+
+
+\numlist\nparen
+\: $\forall x \in V: o(x)\neq o(\bar{x})$
+\: $\exists x,y \in V: o(x)=1 \wedge o(y)=0 $ a v grafu existuje
+orientovaná cesta z $x$ do $y$
+\endlist
+
+\proof
+První podmínka øíká, ¾e promìnná a její negace musí dostat ka¾dá jinou hodnotuZ
+konstrukce ohodnocení plyne. Druhé ohodnocení odpovídá implikaci, která není
+lplnìna, ohodnocení tedy falzifikuje.
+
+\rem
+Pokud $a_1,\ldots,a_k$ tvoøí silnì souvislou kompomentu (SSK) grafu $G_{\cal{F}}$, tak také $\bar{a_1},\ldots,\bar{a_k}$ tvoøí SSK komponentu v $G_{\cal{F}}$ a naopak.
+
+\thm $\cal{F}$ je falsifikovatelná právì kdy¾ neexistuje ¾ádný vrchol $x \in V$ takový, ¾e $x$ a $\bar{x}$ patøí do stejné silnì souvislé komponenty v grafu $G_{\cal{F}}$.
+
+\proof
+\itemize\ibull
+\: ``$\implication$'' sporem: nech» jsou $x$ a $\bar{x}$ ve stejné SSK.
+Z toho vyplývá, ¾e pro ka¾dé ohodnocení promìnných existuje cesta v grafu $G_{\cal{F}}$ z 1 do 0.
+Podle pøedchozí vìty takové ohodnocení není falsifikující, $\F$ tedy není falsifikovatelná.
+
+\FIXME Zkontrolovat. Zdá se mi, ¾e algoritmus je psaný pro splnitelnost \<CNF>,
+nikoliv pro falzifikovatelnost \<DNF>. Sporem dokazuju, ¾e v grafu nevznikne
+cesta z 0 do 1, co¾ je ale pøesnì to, co pro falzifikovatelnost potøebuju.
+
+\: ``$\invimplication$'' konstruktivnì: Zkonstruujeme ohodnocení $o$ pro vrcholy splòující podmínky 1) a 2) z pøedchozí vìty.
+Postupujeme následovnì:
+	\numlist\nromanp
+	\: Graf SSK je acyklický $\Rightarrow$ existuje topologicky poslední komponenta (¾ádné hrany ven). Oznaème ji jako $C$.
+	\: V¹em literálùm v $C$ dáme hodnotu 1 ($\forall u \in C: o(u) = 1$), co¾ zároveò vynutí 0 v doplòkové komponentì ($\forall \bar{u} \in \bar{C}: o(\bar{u}) = 0$), která je díky dualitì cest topologicky první (¾ádné hrany dovnitø).
+	\: Pøedchozí dva kroky iterujeme.
+	\endlist
+
+\FIXME Zkontrolovat i toto. 
+
+Ovìøení funkènosti postupu - sporem: pøedpokládejme, ¾e nám pomocí vý¹e
+uvedeného postupu vznikla cesta z 1 do 0. 
+
+\fig{sat_proof.eps}{\epsfxsize}
+
+V okam¾iku, kdy $C_2 \assign 1$ je¹tì $C_1$ nebylo ohodnoceno. Ale
+díky dualitì musí existovat cesta z $\overline{C}_2$ do  $\overline{C}_1$,
+\fig{sat_proof_neg.eps}{\epsfxsize}
+co¾ ale znamená, ¾e $\overline{C}_2$ nebyla v okam¾iku ohodnocení topologicky poslední.
+
+\endlist
+
+
+\medskip
+
+\sec{Hornovské \<DNF>}
+
+\defnn{Hornovská formule}
+
+$\cal{F}$ je \df{hornovská} \<DNF> $\Leftrightarrow$ ka¾dý term z $F$ obsahuje nejvý¹e 1 negativní literál.
+Pokud obsahuje právì 1 negativní literál jde o èistì hornovskou funkci.
+
+\algo{Falzifikující ohodnocení pro Horn-SAT}
+\algin{Hornovská \<DNF> $\F$}
+\: spustit na $\F$ algoritmus Unit propagation
+\: pokud Unit propagation nalezne spor, je formule $\F$ falsifikovatelná - algoritmus pokraèuje, jinak $\F$ není falsifikovatelná - algoritmus konèí nezdarem
+\: Falsifikující ohodnocení formule $\F$ je slo¾eno z èásteèného ohodnocení získaného pøi Unit propagation v prvním kroku - zbytek jsou 0. 
+\algout{falsifikující ohodnocení formule $\F$ (existuje-li)}
+\endalgo
+
+
+\defn
+\<DNF> $\F$ je skrytì hornovská, pokud existuje podmno¾ina $S$ promìnných z $\F$, taková, ¾e po substituci $\forall x \in S: x \rightarrow \bar{x},\bar{x} \rightarrow x$ vznikne z $\F$ hornovská \<DNF> $\F^{'}$.
+
+\example 
+$$
+\F = x_1 \overline{x}_2 \overline{x}_3 \lor
+x_1 \overline{x}_4 \lor
+x_2 x_3 \overline{x}_4 \lor
+x_1 x_3 x_4 \lor
+x_1 \overline{x}_2 x_3 \lor
+\overline{x_1} \overline{x}_2 \overline{x_3}
+$$
+Po otoèení $x_2$, $x_4$ dostaneme hornovskou formuli.
+\bye

@@ -1,0 +1,61 @@
+\input ../macros.tex
+
+% Sazba obsahu
+\newwrite\toc
+\immediate\openout\toc=bf.toc
+\def\writetoc#1#2{\write\toc{\string\tocentry{#1}{#2}{\the\count0}}}
+\def\tocout{
+\immediate\closeout\toc
+\immediate\openin\toc=bf.toc
+\ifeof\toc
+\else
+\input bf.toc
+\fi
+\immediate\closein\toc
+}
+
+% Ujisti se, ze na strance zbyva dost mista
+\def\prechapter#1#2{%
+\checkroom{30pt}
+\writetoc{#1}{#2}
+}
+\def\chapterend{\bigbreak\bigbreak}
+
+{\nopagenumbers
+\vglue 1cm
+\centerline{\Large doc. RNDr. Ondøej Èepek, Ph.D.}
+\bigskip
+\bigskip
+\centerline{\big Boolovské funkce a jejich aplikace}
+\bigskip
+\bigskip
+\centerline{\large dle pøedná¹ky zapsali Tomá¹ Kuèa a Jindøich Vodrá¾ka}
+
+\centerline{\large ITI 2010}
+\vskip 0.5cm
+\eject
+
+\bigskip
+\eject
+}
+
+\input body.tex
+
+\vfill\eject
+
+~~~
+
+\vfill\eject
+
+\def\writetoc#1#2{}
+\prednaska{O}{Obsah}{}
+
+\def\tocentry#1#2#3{\line{\hbox to 1.5em{\hfil #1.} #2\dotfill #3}\vskip 2pt}
+\tocout
+\tocentry{O}{Obsah}{\the\count0}
+
+\vfill\eject
+\nopagenumbers
+
+
+\eject\end

@@ -1,0 +1,162 @@
+\input ../macros.tex
+
+\prednaska{6}{Rozpoznávání prahových funkcí}{}
+
+V první èásti kapitoly se zamìøíme na rozpozávání prahových funkcí. Ve zbytku se zamìøíme na úvod do SATu a uká¾eme algoritmus, který vyøe¹í 2-SAT v èase $\O(n)$.
+
+\medskip
+
+Pøedpokládáme, ¾e vstupní DNF je unární. Potom BÚNO platí, ¾e vstupní DNF je
+pozitivní (jinak nahradím negované promìnné novými). Máme triviálnì \<MTP>
+a známe algoritmus, který z \<MFP> vyrobí \<MTP>.
+ 
+
+\claim\id{threshold_eqn}
+
+ Nech» $x^1, \dots, x^q$ jsou \<MFP> funkce $f$ a $y^1, \dots, y^r$ jsou \<MTP> funkce $f$, pak
+ $f$ je prahová, právì kdy¾ systém nerovností 
+
+
+$$
+\eqalign{
+ \sum_{i=1}^{n}v_i x_i^j \le p & \qquad  1 \le j \le q \cr
+ \sum_{i=1}^{n}v_i y_i^j \ge p +1 & \qquad 1 \le j \le r \cr
+ v \ge 0
+}
+$$
+
+má øe¹ení $(v_1, \ldots, v_n, p)$.
+
+\proof
+
+Dùkaz vychází z toho, ¾e ka¾dý \<TP> (\<FP>) je obsa¾en v nìjakém \<MTP>
+(\<MFP>). $p+1$ mù¾u proto, ¾e v¾dy je tam $\varepsilon$-ová nerovnost, po
+vynásobení vhodnou konstantou ji zvét¹ím a¾ na 1.
+
+
+\algo{Rozpoznávání prahových funkcí}
+\algin{pozitivní funkce $f$}
+\: Otestuj regularitu $f$. Pokud $f$ není regulární, není ani prahová. 
+\: Zkonstruuj duální $f^d$ 
+\: Sestav soustavu rovnic dle tvrzení \ref{threshold_eqn} a vyøe¹.
+\: Existuje-li øe¹ení, je funkce prahová, jinak ne.
+\algout{rozhodnutí, zda je $f$ prahová}
+
+Test regularity umíme v èase $\O(n^2m^2)$, lze v $\O(n^2m)$ u¾itím vhodných
+datových struktur. Stejnì tak konstrukci duální funkce. Soustavu rovnic lze vyøe¹it
+v polynomiálním èase u¾itím lineárního programování.
+
+\rem
+Nalezení diskrétního, kombinatorického algoritmu, který by danou úlohu øe¹il, je otevøený problém.
+
+\vskip 0.5cm
+
+\sec{Úvod do SATu}
+
+K èemu je u¾iteèná úloha splnitelnosti CNF z hlediska umìlé inteligence?
+
+Mìjme model sestávající se 
+
+%$$
+%\vbox{
+%\offinterlineskip
+%\halign{ \qquad#\dotfill &  #  \vline & # \cr 
+%    d & dveøe & otevøené/zavøené \cr
+%}}$$
+
+$$\vbox{
+\offinterlineskip
+\halign{
+
+\qquad#\dotfill & # & #  \cr
+\hbox to 0.1\hsize{}\cr
+    $d$ & dveøe & otevøeno/zavøeno \cr
+    $s$ & siréna & houká/nehouká \cr
+    $a$ & majáèek & bliká/nebliká \cr
+    $m$ & monitor & zobrazuje/nezobrazuje dveøe $d$ \cr
+}}$$
+
+Definujme v nìm následující pravidla: 
+$$\vbox{
+\offinterlineskip
+\halign{
+
+\qquad# & #\hfill \cr
+\hbox to 0.1\hsize{}\cr
+    $d \rightarrow a$ &  pokud jsou dveøe otevøené, bliká majáèek \cr
+    $d \rightarrow m$ &  pokud jsou dveøe otevøené, zobrazují se na monitoru \cr
+    $s \rightarrow a$ & pokkud houká siréna, blíká majáèek \cr
+    $s \rightarrow m$ & pokud houká siréna, zobrazují se dveøe na monitoru \cr
+    $a \land m \rightarrow d$ & pokud bliká majáèek a dveøe se zobrazují na monitoru, jsou otevøené \cr
+    $a \land m \rightarrow s$ & pokud bliká majáèek a dveøe se zobrazují na monitoru, houká siréna \cr
+}}$$
+
+Pravidla lze pøepsat na $(\neg d \lor a)$, $(\neg d \lor m))$, $(\neg s \lor
+a)$, $(\neg s \lor m)$, $(\neg a \lor \neg m \lor d)$, $(\neg a \lor \neg
+m \lor s)$. V¹echna pravidla jsou splnìna právì tehdy, kdy¾ je odpovídající CNF
+splnìna. Model expertního systému odpovídá splòujícímu ohodnocení CNF.
+
+
+Odpovídání na dotazy: 
+
+\itemize\ibull
+    \: Otázka: Je pravda, ¾e pokud bliká majáèek, monitor zobrazuje dveøe ($a \rightarrow m$)?
+
+        Ekvivaletnì: je pravda, ¾e v ka¾dém modelu, kde $a=1$ zároveò platí, ¾e
+        $m=1$? Dosadíme do CNF pravidel $a=1$, $m=0$ a otestujeme SAT: $(\neg
+        d) \land (\neg s)$ je splnitelná formule, tedy odpovìï je NE.
+    
+    \: Otázka: Je pravda, ¾e jsou dveøe otevøené, houká siréna ($d \rightarrow s$)?
+
+        Dosadíme do CNF pravidel $d=1$, $s=0$ a otestujeme SAT. $(a) \land (s) \land (\neg a \lor \neg m)$ je nesplnitelná formule, tedy odpovìï je ANO.
+    \: Otázka: Je $a \rightarrow m$ platné pravidlo?
+
+
+$$
+\eqalign{
+    \F = 1 \implication & (a \rightarrow m) = 1 \cr
+                         & (\neg a \lor m) = 1 \cr
+    (\neg a \lor m) \implication & \F = 0 \cr
+}
+$$
+\todo zkontrolovat, zdá se mi to divné
+
+        Dosadíme do CNF pravidel $a=1$, $m=0$ a otestujeme SAT. $d = s = 1$ je model, formule je tedy splnitelná a odpovìï je NE.
+
+    \: Otázka: Dveøe jsou otevøené. Je potom pravda, ¾e pokud bliká majáèek, monitor zobrazuje dveøe ($a \rightarrow m$)?
+
+        ANO
+
+\endlist
+
+
+\vskip 1cm
+
+\h{2-SAT v øeèi DNF}
+
+Nejprve uká¾eme, ¾e je korektní se omezit pouze na formule, které neobsahují
+termy délky~1. Uká¾eme dvì varianty algoritmu, který vytvoøí ekvivalentní formuli,
+která jednotkové termy neobsahuje.
+
+\paran{Unit propagation}
+
+Idea: termy délky 1 mù¾u pøímo dosadit.
+\algo{Odstranìní termù délky 1}
+\algin{Formule $\F$ obsahující termy délky max. 2}
+\: Dokud je v $\F$ jednotkový term $u$: 
+\:: zafixuj $u = 0$, dosaï do $\F$
+\: Pokud vznikl prázdný tem, $\F$ není falzifikovatelná, jinak mám $\F'$ bez jednotkových termù
+\algout{Formule $\F$ obsahující termy délky právì. 2}
+\endalgo
+
+Algoritmus lze pøímoèaøe implementovat v èase $\O(ln)$, kde $l$ je poèet
+literálù a $n$ poèet promìnných. Uká¾eme, algoritmus, který propagaci provede v èase $\O(l)$. 
+
+\fig{unitpropagation.eps}{\epsfxsize}
+
+Zkonstruuju strukturu, viz obr., kde $x_1, \ldots, x_n$ jsou promìnné, $T_1,
+\ldots, T_n$ termy . Poté procházím frontu 1-prvkových termù. Pro ka¾dou jeho promìnnou projdu odpovídající øádek:
+Pokud v termu $i$ je negace, odstraním ji a zkontroluju, zda jsem nevytvoøil seznam délky 1.
+
+
+\bye

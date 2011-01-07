@@ -1,0 +1,201 @@
+\input ../macros.tex
+
+\prednaska{4}{Duální funkce}{}
+
+V této kapitole zavedeme pojem duálních funkcí a popí¹eme jejich vlastnosti.
+V závìru popí¹eme algoritmus, který pøevede regulární funkci na její duál.
+
+\medskip
+
+\defnn{Duální funkce}
+Nech» $f(x_1, \dots, x_n)$ je booleovská funkce. Pak \df{duální boolovská
+funkce} $f^d$ je definována pøedpisem $f^d(x) = \neg f(\neg x)$.
+
+\example
+
+$$
+\eqalign{
+f(x_1, \dots, x_5) &= x_1x_2 \lor x_3x_4 \lor x_1x_4x_5 \lor x_2x_3x_5 \cr
+f^d(x_1, \dots, x_5) &= \neg f(\neg x_1, \dots, \neg x_5) = \cr
+& = \neg (\overline{x_1}\overline{x_2} \lor \overline{x_3}\overline{x_4} \lor \overline{x_1}\overline{x_4}\overline{x_5} \lor \overline{x_2}\overline{x_3}\overline{x_5} \cr
+& = (x_1 \lor x_2) \land (x_3 \lor x_4) \land (x_1 \lor x_4 \lor x_5) \land (x_2
+\lor x_3 \lor x_5) \cr
+& = (x_1 \lor x_2x_4 \lor x_2x_5) \land (x_3 \lor x_2x_4 \lor x_4x_5) \cr
+& = (x_1x_3 \lor x_2x_4 \lor x_1x_4x_5 \lor x_2x_3x_5)
+}
+$$
+
+Duální funkce má svou interpretaci v teorii grafù: 
+
+    \halign{\qquad#\dotfill&~#\hfil\cr
+    \hbox to 0.15\hsize{}\cr
+    $f$       &v¹echny cesty $st$ \cr
+    $f^d$     &v¹echny øezy \cr
+    }
+
+
+\fig{dual.eps}{\epsfxsize}
+
+Slo¾itost dualizace je neznámá. Je známý kvazi-polynomiální algoritmus ve
+velikosti výstupu. DNF zápis duální funkce obecnì mù¾e být exponenciálnì dlouhý
+k délce DNF zápisu $f$:
+
+$$
+\eqalign{
+f(x_1, \dots, x_n) &= x_1x_2 \lor x_3x_4 \lor \dots \lor x_{2n-1}x_{2n} \cr
+f^d(x_1, \dots, x_n) &= (x_1 \lor x_2)(x_3 \lor x_4)\dots(x_{2n-1} \lor x_{2n}) \cr
+& =\hbox{$2^n$ termù délky $n$} 
+}
+$$
+
+\defn
+$\vec{x}$ je \df{minimální true-point} funkce $f$ (\<MTP>) 
+$\iff  f(\vec{x}) = 1 \& \forall  i : f(\vec{x} - e_i) = 0 $
+$\iff$  $\vec{x}$ odpovídá primární implikantu $f$
+
+$\vec{x}$ je \df{maximální false-point} funkce $f$ (\<MFP>) 
+$\iff  f(\vec{x}) = 0 \& \forall  i : f(\vec{x} \cup e_i) = 1 $
+$\iff$  $\vec{x}$ odpovídá primární implikantu $f^d$
+
+
+\obs 
+Nech» $\prod_{i \in I}{x_i}$ je primární implikant v $f^d$. Pak $I$ je minimální mno¾ina indexù taková, ¾e 
+
+$$ \left.
+\eqalign{
+x_i  =  1, i \in I    \cr
+x_i  =  0, i \notin I  \cr}
+\right\} \implication f^d(x) = 1
+$$
+
+$f^d(x) = 1 \iff \neg f(\neg x) = 0 \iff f(\neg x) = 0$
+
+$I$ je minimální mno¾ina indexù taková, ¾e 
+
+$$ \left.
+\eqalign{
+x_i  =  0, i \in I    \cr
+x_i  =  1, i \notin I  \cr}
+\right\} \implication f(x) = 0
+$$
+
+$\implication$ nuly v $\vec{x}$ odpovídají promìnným v primárním implikantu
+$f^d$.
+
+V následující èásti uká¾eme, ¾e pro dualizaci pozitivní DNF nám staèí algoritmus, který na vstupu dostane seznam
+MTP a na výstupu vydá seznam \<MFP>. 
+
+\thm
+
+Nech» $f(x_1, \dots, x_n)$ je regulární  funkce, 
+kde $x_1 \succeq_f x_2 \succeq_f \dots \succeq_f x_n$ a nech» $x \in \{0, 1\}^{n-1}$. 
+Pak $(\vec{x}, 0)$ je \<MFP> $\iff (\vec{x}, 1)$ je \<MTP>
+
+\proof 
+
+Nech» $(\vec{x}, 0)$ je \<MFP> funkce $f$ $\implication (\vec{x}, 1)$ je \<TP>.
+Zároveò $f(x_1, \dots, x_{i-1}, 0, x_{i+1}, \dots, 1) \le f(\vec{x}, 0) = 0$,
+tedy $(\vec{x}, 1)$ je \<MTP> funkce $f$.
+
+Obdobnì nech» $(\vec{x}, 1)$ je \<MTP> funkce $f$ $\implication (\vec{x}, 0)$ je \<FP>.
+Zároveò $f(x_1, \dots, x_{i-1}, 1, x_{i+1}, \dots, 0) \le f(\vec{x}, 1) = 1$,
+tedy $(\vec{x}, 0)$ je \<MFP> funkce $f$.
+
+\defn
+Nech» $f(x_1, \dots, x_n)$ je booleovská funkce. Definujme funkci $f_i$ jako
+\df{restrikci} funkce $f$ po zafixování $x_i = x_{i+1} = \dots x_n = 1$.
+Dodefinujme $f_{n+1} = f$.
+
+\thm 
+
+Nech» $f$ je pozitivní boolovská funkce a nech» $x \in \{0, 1\}^{n-1}$. Potom
+$(\vec{x}, 1)$ je \<MFP> právì tehdy, kdy¾ $\vec{x}$ je \<MFP> $f_{n-1}$ (tj. $f$
+na prvních $n-1$ promìnných).
+
+\proof Zøejmý, z definice \<MFP>.
+
+\algo{Dualizace regulárních funkcí}
+\algin{formule $f$}
+\: Pro $i \in (n+1, \dots, 2)$:
+\:: vygeneruj \<MFP> funkce $f_i$, pro které $x_{i-1} = 0$
+\:: zafixuj $x_{i-1} = 1$ a zjisti \<MTP> funkce $f_{i-1}$
+\algout{formule $f^d$ duální k $f$}
+
+Celkovì probìhne $n$ iterací. Slo¾itost algoritmu je $\O(n^2m^2)$, nejnároènìj¹í jsou absorbce.
+
+\example 
+
+Mìjme funkci zadanou formulí
+$$
+ f(x_1, \dots, x_5) = x_1x_2 \lor x_1x_3 \lor x_1x_4 \lor x_2x_3 \lor x_2x_4x_5 
+$$
+
+Lze ovìøit, ¾e funkce je regulární. Iterace algoritmu budou následující: 
+\itemize\ibull
+    \: $i = 6$
+
+        jediný implikant, který obsahuje $x_5$ je $x_2x_4x_5$. Jeho
+        charakteristika je $01011$, tedy charakteristika \<MFP> je $01010$
+        (pøeklopíme $i-1$-tou
+        slo¾ku), a té odpovídá $x_1x_3x_5$ 
+    \: $i = 5$
+
+        polo¾ $x_5 = 1$ a absorbuj 
+
+        $f(x_1, x_2, x_3, x_4) = x_1x_2 \lor x_1x_3 \lor x_1x_4 \lor x_2x_3 \lor x_2x_4$
+
+        $$ 
+        \eqalign{
+        \<MTP > x_1x_4 \rightarrow 10011 & \rightarrow \<MFP > 10001 \rightarrow x_2x_3x_4 \cr
+        \<MTP > x_2x_4 \rightarrow 01011 & \rightarrow \<MFP > 01001 \rightarrow x_1x_3x_4 
+        }
+        $$
+        
+    \: $i = 4$
+
+        polo¾ $x_4 = 1$ a absorbuj 
+
+        $f(x_1, x_2, x_3) = x_1x_2$ 
+
+    \: $i = 3$
+
+        $f(x_1, x_2, x_3) = x_1x_2$ 
+
+    \: $i = 2$
+
+        $f(x_1, x_2) = x_1x_2$ 
+
+        $$ 
+        \<MTP > x_2 \rightarrow 01111 \rightarrow \<MFP > 00111 \rightarrow x_1x_2
+        $$
+
+\endlist
+
+Tedy duální formule má tvar  $(x_1 \lor x_2) \land (x_1 \lor x_3 \lor x_4) \land (x_2 \lor
+\lor x_3 \lor x_4) \land (x_1 \lor x_3 \lor x_5)$.
+        
+\medskip
+
+
+Jak je to se sílou promìnných?
+
+$$
+\eqalign{
+f^d(1, 0, \dots) &= x_3x_4 \lor x_3x_5 \cr
+f^d(0, 1, \dots) &= x_3x_4 
+}
+$$
+
+Tedy $x_1 \succeq_{f^d} x_2$. Lze ovìøit, ¾e síla promìnných zùstane
+i v ostatních pøípadech.
+
+\thmn{O regulárnosti duální funkce}
+Nech» $f$ je regulární boolovská funkce. Pak její duální formule $f^d$ je také regulární, navíc ke
+stejnému poøadí promìnných. 
+
+\proof
+
+BÚNO $i=1$, $j=2$. Pak $f^d(1, 0, x_3, \dots, x_n) = \neg f(0, 1, \neg x_3, \dots, \neg x_n) \ge \neg f(1, 0, \dots,  \neg x_n) = f^d(0, 1, \dots, \ x_n)$
+
+
+\bye
