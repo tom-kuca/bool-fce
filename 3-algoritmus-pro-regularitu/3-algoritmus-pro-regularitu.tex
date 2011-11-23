@@ -5,7 +5,7 @@
 Cílem této kaiptoly je popsat algoritmus na rozpoznávání regulárních funkcí.
 V prùbìhu celé kapitoly uva¾ujeme, ¾e na vstupu je pozitivní DNF formule.
 
-\thm\id{bc_thm}
+\thm\id{bcthm}
 Nech» $f$ je pozitivní boolovská funkce v $n$ promìnných a $\F$ je kanonická DNF funkce $f$. Zapi¹me $\F$ ve tvaru 
 $$\F = A x_i x_j \lor Bx_i \lor Cx_j \lor D,$$
 kde $x_i, x_j$ jsou lib. promìnné a $A, B, C, D$ jsou DNF na zbylých promìnných. Pak $x_i \succeq x_j$ právì tehdy, kdy¾ $B \ge C$.
@@ -60,7 +60,7 @@ Pro ka¾dé $i$, $j$ otestujeme, zda $x_i \succeq x_j$ a $x_j \succeq x_i$ v èase 
 \proof
 
 \numlist\nalpha
-    \:  $x_i \sim x_j \iff B = C$ (ve smyslu vìty \ref{bc_thm}) $\implication$ nech» $p$ je implikant $C$, díky $\ge \exists q \in B$ absorbující $p$ a obrácenì, tj. $ p = q \implication B$ a $C$ jsou identické DNF
+    \:  $x_i \sim x_j \iff B = C$ (ve smyslu vìty \ref{bcthm}) $\implication$ nech» $p$ je implikant $C$, díky $\ge \exists q \in B$ absorbující $p$ a obrácenì, tj. $ p = q \implication B$ a $C$ jsou identické DNF
     \: Chceme $ x_i \succ x_j \implication R_i  > R_j $. Platí $x_i \succ x_j \iff B > C$. Definujme
     $$
     \eqalign{
