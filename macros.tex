@@ -45,6 +45,10 @@
 % Zacatek prednasky {cislo prednasky}{jmeno prednasky}{jmeno zapisovatele}
 \def\prednaska#1#2#3{%
 \prechapter{#1}{#2}
+\thmcount=0
+\footcnt=0
+\edef\currentchap{#1}
+\edef\currentid{\currentchap.\the\thmcount}
 \vbox{%
 \line{{\Large\bf #1. #2} \hfil {\it #3}}
 \vskip 4pt
@@ -138,12 +142,10 @@
 %%% Chapters, sections and proclamations %%%
 
 \newcount\chapcount
-\newcount\seccount
 \newcount\thmcount
 \newcount\tmpcount
 \newcount\figcount
 \chapcount=0
-\seccount=0
 \thmcount=0
 \figcount=0
 \def\currentid{??}
@@ -156,15 +158,18 @@
 \def\para{\smallskip\noindent}
 
 \def\fignext{\advance\figcount by 1
-\edef\currentid{\currentchap.\the\seccount.\the\figcount}
+\edef\currentid{\currentchap.\the\figcount}
+}
+
+\def\thmnext{\advance\thmcount by 1
+\edef\currentid{\currentchap.\the\thmcount}
 }
 
 
-
-\def\proclaim#1{\para {\bf #1.\enspace}}
+\def\proclaim#1{\para {\bf #1 \enspace}}
 \def\fignum#1{\fignext\noindent {Obr\'{a}zek \currentid.\enspace} {#1.\enspace}}
 
-\def\thm{\proclaim{V\v{e}ta}}
+\def\thm{\thmnext\proclaim{V\v{e}ta \currentid}}
 \def\lemma{\proclaim{Lemma}}
 \def\claim{\proclaim{Tvrzen\'\i{}}}
 \def\defn{\proclaim{Definice}}
@@ -267,7 +272,7 @@
 
 \def\ref#1{\expandafter\ifx\csname id#1\endcsname\relax
 {\bf ??}%
-\immediate\write16{*** Warning: Reference #1 undefined ***}%
+\immediate\write16{*** Warning: Reference id#1 undefined ***}%
 \else
 \csname id#1\endcsname
 \fi
@@ -279,4 +284,3 @@
 
 % Ujisti se, ze na strance je dostatek mista, pripadne zacne novou stranku
 \def\checkroom#1{\vskip 0pt plus #1\goodbreak\vskip 0pt plus -#1}
-
